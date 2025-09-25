@@ -44,7 +44,7 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: oklch(0.9702 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.141 0.005 285.823);
@@ -78,7 +78,7 @@
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
+  --background: oklch(0.9702 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: oklch(0.985 0 0);
@@ -122,9 +122,9 @@
 
 @layer components {
   .pad-x {
-    @apply mx-auto max-w-[1280px] px-4 md:px-[4%];
+    @apply mx-auto max-w-[1280px] px-4 md:px-[2%];
   }
   .pad-x-xl {
-    @apply px-4 md:px-[6%] lg:px-[10%] xl:px-[12%];
+    @apply px-4 md:px-[2%] lg:px-[6%] xl:px-[8%];
   }
 }

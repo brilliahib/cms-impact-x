@@ -6,7 +6,7 @@ import NavLink from "@/components/atoms/navbar/NavLink";
 
 export default function Navbar() {
   return (
-    <div className="fixed top-0 left-0 z-40 w-full bg-white">
+    <div className="fixed top-0 left-0 z-40 w-full border-b bg-white">
       <div className="pad-x-xl flex justify-between py-4">
         <NavL />
         <nav className="hidden items-center font-semibold md:flex">

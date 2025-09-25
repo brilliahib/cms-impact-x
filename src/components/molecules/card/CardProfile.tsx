@@ -38,7 +38,7 @@ const CardProfile = () => {
 
         <div className="flex w-full flex-col gap-2 md:ml-auto md:w-auto md:flex-row">
           <Button className="w-full md:w-auto">Follow</Button>
-          <Button className="w-full bg-white text-black shadow-sm shadow-black hover:bg-gray-300 md:w-auto">
+          <Button variant={"outline"}>
             <Download />
             Download Portofolio
           </Button>
