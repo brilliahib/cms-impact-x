@@ -5,8 +5,9 @@ import Image from "next/image";
 
 const CardProfile = () => {
   return (
-    <Card className="w-3/4 overflow-hidden p-0">
-      <div className="relative h-44 w-full">
+    <Card className="w-full overflow-hidden p-0 md:w-3/4">
+      {/* Background */}
+      <div className="relative h-32 w-full md:h-44">
         <Image
           src="/images/profile/bg.jpg"
           alt="background"
@@ -15,7 +16,8 @@ const CardProfile = () => {
         />
       </div>
 
-      <div className="relative -mt-24 ml-4 flex h-[150px] w-[150px] justify-start rounded-full">
+      {/* Profile Picture */}
+      <div className="relative -mt-16 ml-4 flex h-[100px] w-[100px] justify-start rounded-full md:-mt-24 md:h-[150px] md:w-[150px]">
         <Image
           src="/images/profile/profile.jpg"
           alt="profile"
@@ -24,46 +26,52 @@ const CardProfile = () => {
         />
       </div>
 
-      <div className="-mt-24 flex flex-row items-center gap-6 px-6">
-        <div className="ml-40">
-          <h2 className="font-bold">John Doe</h2>
-          <p className="font-medium text-gray-900/60">UI/UX Designer</p>
+      <div className="-mt-0 flex flex-col items-start gap-4 px-6 md:-mt-24 md:flex-row md:items-center md:gap-6">
+        <div className="md:ml-40">
+          <h2 className="text-lg font-bold md:text-xl">John Doe</h2>
+          <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
+            <p>UI/UX Designer</p>
+            <span className="opacity-30">|</span>
+            <p className="text-sky-600">40+ Followers</p>
+          </div>
         </div>
 
-        <div className="ml-auto flex gap-2">
-          <Button>Follow</Button>
-          <Button className="bg-white text-black shadow-sm shadow-black hover:bg-gray-300">
+        <div className="flex w-full flex-col gap-2 md:ml-auto md:w-auto md:flex-row">
+          <Button className="w-full md:w-auto">Follow</Button>
+          <Button className="w-full bg-white text-black shadow-sm shadow-black hover:bg-gray-300 md:w-auto">
             <Download />
             Download Portofolio
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-row justify-between gap-6 p-6">
-        {/* About Section */}
+      <div className="flex flex-col justify-between gap-6 p-6 md:flex-row">
         <div className="flex-1">
-          <CardTitle className="pb-4 text-lg">About</CardTitle>
-          <CardDescription className="mb-4 tracking-wider">
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Est
-            aperiam eius magnam consequuntur nisi fuga reprehenderit maxime cum
-            possimus doloremque voluptatum expedita sequi nihil exercitationem
-            alias, non adipisci sapiente. Tenetur neque cupiditate optio
-            recusandae modi nam. Amet doloribus impedit reprehenderit ex quas,
-            excepturi, ipsum doloremque praesentium consequatur esse beatae
-            accusamus.
+          <CardTitle className="pb-2 text-base md:pb-4 md:text-lg">
+            About
+          </CardTitle>
+          <CardDescription className="mb-4 text-justify text-xs tracking-wider md:text-base">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit,
+            labore deserunt. Cupiditate odio assumenda consectetur perferendis
+            et velit facere quidem voluptas ut voluptatibus ad nesciunt esse
+            fuga, fugiat exercitationem unde debitis quisquam sed amet,
+            quibusdam nobis veniam. Exercitationem, adipisci minima quam
+            incidunt tempora provident voluptate porro, atque, ducimus vitae et!
           </CardDescription>
         </div>
 
-        <div className="flex basis-1/5 flex-row items-center gap-1">
+        <div className="flex basis-full flex-row items-center gap-2 md:basis-1/5">
           <Image
             src="/images/profile/undip.png"
-            width={60}
-            height={60}
+            width={50}
+            height={50}
             alt="undip"
             className="rounded-md"
           />
           <div className="flex flex-col">
-            <h2 className="text-sm font-semibold">Universitas Diponegoro</h2>
+            <h2 className="text-xs font-semibold md:text-sm">
+              Universitas Diponegoro
+            </h2>
             <p className="text-xs">S1 Teknik Komputer</p>
           </div>
         </div>
