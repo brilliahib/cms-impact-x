@@ -20,7 +20,9 @@ export default function NavLink() {
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Activity</NavigationMenuTrigger>
+          <NavigationMenuTrigger className="bg-white!">
+            Activity
+          </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-2 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
               {components.map((component) => (
@@ -58,7 +60,7 @@ function ListItem({
 }) {
   return (
     <li {...props}>
-      <NavigationMenuLink asChild>
+      <NavigationMenuLink asChild className="hover:bg-background!">
         <Link href={href}>
           <div className="flex items-start space-x-2">
             {Icon && (
