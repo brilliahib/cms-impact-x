@@ -12,7 +12,7 @@ export default function CardListDetailActivity() {
         <div className="space-y-0">
           <Card className="hover:bg-background rounded-none! border-0 border-t border-b py-4 shadow-none">
             <CardContent className="flex justify-between gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col">
                 <div className="flex flex-row gap-2">
                   <Image
                     src={"/images/profile/profile-2d.png"}
@@ -20,12 +20,12 @@ export default function CardListDetailActivity() {
                     width={50}
                     height={50}
                   />
-                  <div className="flex flex-col">
+                  <div className="flex flex-col gap-1 text-xs">
                     <p className="font-medium">Bagus Tri Atmojo</p>
                     <div className="flex flex-row gap-1">
                       <p>UI/UX Designer</p>
                       <span className="opacity-30">|</span>
-                      <p className="font-medium">Universitas Diponegoro</p>
+                      <p>Universitas Diponegoro</p>
                     </div>
                   </div>
                 </div>
@@ -48,7 +48,7 @@ export default function CardListDetailActivity() {
           </Card>
           <Card className="hover:bg-background rounded-none! border-0 border-t border-b py-4 shadow-none">
             <CardContent className="flex justify-between gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col">
                 <div className="flex flex-row gap-2">
                   <Image
                     src={"/images/profile/profile-2d.png"}
@@ -56,12 +56,12 @@ export default function CardListDetailActivity() {
                     width={50}
                     height={50}
                   />
-                  <div className="flex flex-col">
+                  <div className="flex flex-col gap-1 text-xs">
                     <p className="font-medium">Bagus Tri Atmojo</p>
                     <div className="flex flex-row gap-1">
                       <p>UI/UX Designer</p>
                       <span className="opacity-30">|</span>
-                      <p className="font-medium">Universitas Diponegoro</p>
+                      <p>Universitas Diponegoro</p>
                     </div>
                   </div>
                 </div>
@@ -84,7 +84,7 @@ export default function CardListDetailActivity() {
           </Card>
           <Card className="hover:bg-background rounded-none! border-0 border-t border-b py-4 shadow-none">
             <CardContent className="flex justify-between gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col">
                 <div className="flex flex-row gap-2">
                   <Image
                     src={"/images/profile/profile-2d.png"}
@@ -92,12 +92,12 @@ export default function CardListDetailActivity() {
                     width={50}
                     height={50}
                   />
-                  <div className="flex flex-col">
+                  <div className="flex flex-col gap-1 text-xs">
                     <p className="font-medium">Bagus Tri Atmojo</p>
                     <div className="flex flex-row gap-1">
                       <p>UI/UX Designer</p>
                       <span className="opacity-30">|</span>
-                      <p className="font-medium">Universitas Diponegoro</p>
+                      <p>Universitas Diponegoro</p>
                     </div>
                   </div>
                 </div>
@@ -120,7 +120,7 @@ export default function CardListDetailActivity() {
           </Card>
           <Card className="hover:bg-background rounded-none! border-0 border-t border-b py-4 shadow-none">
             <CardContent className="flex justify-between gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col">
                 <div className="flex flex-row gap-2">
                   <Image
                     src={"/images/profile/profile-2d.png"}
@@ -128,156 +128,12 @@ export default function CardListDetailActivity() {
                     width={50}
                     height={50}
                   />
-                  <div className="flex flex-col">
+                  <div className="flex flex-col gap-1 text-xs">
                     <p className="font-medium">Bagus Tri Atmojo</p>
                     <div className="flex flex-row gap-1">
                       <p>UI/UX Designer</p>
                       <span className="opacity-30">|</span>
-                      <p className="font-medium">Universitas Diponegoro</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="ml-14 flex flex-row gap-2">
-                  <Button variant={"default"} size={"sm"}>
-                    <Check />
-                    Approve
-                  </Button>
-                  <Button
-                    variant={"outline"}
-                    size={"sm"}
-                    className="text-red-600"
-                  >
-                    <X color="red" />
-                    Decline
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="hover:bg-background rounded-none! border-0 border-t border-b py-4 shadow-none">
-            <CardContent className="flex justify-between gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-row gap-2">
-                  <Image
-                    src={"/images/profile/profile-2d.png"}
-                    alt="Profile Image"
-                    width={50}
-                    height={50}
-                  />
-                  <div className="flex flex-col">
-                    <p className="font-medium">Bagus Tri Atmojo</p>
-                    <div className="flex flex-row gap-1">
-                      <p>UI/UX Designer</p>
-                      <span className="opacity-30">|</span>
-                      <p className="font-medium">Universitas Diponegoro</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="ml-14 flex flex-row gap-2">
-                  <Button variant={"default"} size={"sm"}>
-                    <Check />
-                    Approve
-                  </Button>
-                  <Button
-                    variant={"outline"}
-                    size={"sm"}
-                    className="text-red-600"
-                  >
-                    <X color="red" />
-                    Decline
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="hover:bg-background rounded-none! border-0 border-t border-b py-4 shadow-none">
-            <CardContent className="flex justify-between gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-row gap-2">
-                  <Image
-                    src={"/images/profile/profile-2d.png"}
-                    alt="Profile Image"
-                    width={50}
-                    height={50}
-                  />
-                  <div className="flex flex-col">
-                    <p className="font-medium">Bagus Tri Atmojo</p>
-                    <div className="flex flex-row gap-1">
-                      <p>UI/UX Designer</p>
-                      <span className="opacity-30">|</span>
-                      <p className="font-medium">Universitas Diponegoro</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="ml-14 flex flex-row gap-2">
-                  <Button variant={"default"} size={"sm"}>
-                    <Check />
-                    Approve
-                  </Button>
-                  <Button
-                    variant={"outline"}
-                    size={"sm"}
-                    className="text-red-600"
-                  >
-                    <X color="red" />
-                    Decline
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="hover:bg-background rounded-none! border-0 border-t border-b py-4 shadow-none">
-            <CardContent className="flex justify-between gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-row gap-2">
-                  <Image
-                    src={"/images/profile/profile-2d.png"}
-                    alt="Profile Image"
-                    width={50}
-                    height={50}
-                  />
-                  <div className="flex flex-col">
-                    <p className="font-medium">Bagus Tri Atmojo</p>
-                    <div className="flex flex-row gap-1">
-                      <p>UI/UX Designer</p>
-                      <span className="opacity-30">|</span>
-                      <p className="font-medium">Universitas Diponegoro</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="ml-14 flex flex-row gap-2">
-                  <Button variant={"default"} size={"sm"}>
-                    <Check />
-                    Approve
-                  </Button>
-                  <Button
-                    variant={"outline"}
-                    size={"sm"}
-                    className="text-red-600"
-                  >
-                    <X color="red" />
-                    Decline
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="hover:bg-background rounded-none! border-0 border-t border-b py-4 shadow-none">
-            <CardContent className="flex justify-between gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-row gap-2">
-                  <Image
-                    src={"/images/profile/profile-2d.png"}
-                    alt="Profile Image"
-                    width={50}
-                    height={50}
-                  />
-                  <div className="flex flex-col">
-                    <p className="font-medium">Bagus Tri Atmojo</p>
-                    <div className="flex flex-row gap-1">
-                      <p>UI/UX Designer</p>
-                      <span className="opacity-30">|</span>
-                      <p className="font-medium">Universitas Diponegoro</p>
+                      <p>Universitas Diponegoro</p>
                     </div>
                   </div>
                 </div>
