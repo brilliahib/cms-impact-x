@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
-import { Download } from "lucide-react";
+import { Download, Settings } from "lucide-react";
 import Image from "next/image";
 
 const CardProfile = () => {
   return (
-    <Card className="w-full overflow-hidden p-0 md:w-3/4">
+    <Card className="w-full overflow-hidden p-0">
       {/* Background */}
       <div className="relative h-32 w-full md:h-44">
         <Image
@@ -37,7 +37,10 @@ const CardProfile = () => {
         </div>
 
         <div className="flex w-full flex-col gap-2 md:ml-auto md:w-auto md:flex-row">
-          <Button className="w-full md:w-auto">Follow</Button>
+          <Button className="w-full md:w-auto" variant={"outline"}>
+            <Settings />
+            Follow
+          </Button>
           <Button variant={"outline"}>
             <Download />
             Download Portofolio
