@@ -2,14 +2,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function CardCurrentActivity() {
   return (
     <Card>
       <CardHeader className="flex items-center justify-between">
         <CardTitle>Current Activity</CardTitle>
-        <Button variant={"ghost"} className="text-[#0284C7]">
-          See Details
+        <Button
+          variant={"ghost"}
+          className="text-[#0284C7] hover:bg-transparent hover:text-[#0284C7] hover:underline"
+          size={"sm"}
+        >
+          <Link href={"/activity"}>See Details</Link>
         </Button>
       </CardHeader>
       <CardContent>

@@ -1,14 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function CardPeopleSuggest() {
   return (
     <Card>
       <CardHeader className="flex items-center justify-between">
         <CardTitle>People You May Know</CardTitle>
-        <Button variant={"ghost"} className="text-[#0284C7]">
-          See All
+        <Button
+          variant={"ghost"}
+          className="text-[#0284C7] hover:bg-transparent hover:text-[#0284C7] hover:underline"
+        >
+          <Link href={"/suggest"}>See All</Link>
         </Button>
       </CardHeader>
       <CardContent>

@@ -24,8 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${jakartaSans.variable} font-jakarta-sans antialiased`}>
-        <Navbar />
-        <main className="pad-x-xl my-18 md:my-24">{children}</main>
+        {children}
       </body>
     </html>
   );
