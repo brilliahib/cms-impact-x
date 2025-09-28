@@ -1,8 +1,8 @@
 import BreadcrumbContent from "@/components/atoms/breadcrumb/BreadcrumbItem";
 import CardListDetailActivity from "@/components/molecules/card/CardListDetailActivity";
-import CardListPost from "@/components/molecules/card/CardListPost";
 import MessageInput from "@/components/molecules/message/MessageInput";
 import LeftDetailActivity from "./LeftDetailActivity";
+import CardTopPost from "@/components/molecules/card/CardTopPost";
 
 export default function DetailActivityWrapper() {
   return (
@@ -16,7 +16,7 @@ export default function DetailActivityWrapper() {
         </div>
         <div className="flex flex-col gap-4 md:w-1/3">
           <MessageInput />
-          <CardListPost />
+          <CardTopPost />
           <CardListDetailActivity />
         </div>
       </div>
