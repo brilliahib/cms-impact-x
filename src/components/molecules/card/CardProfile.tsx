@@ -3,12 +3,20 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useGetProfileUser } from "@/http/profile/get-profile-user";
+import { buildFromAppURL } from "@/utils/misc";
 import { Download, Settings } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 
 const CardProfile = () => {
   const { data: session, status } = useSession();
+  const { data, isPending } = useGetProfileUser(
+    session?.access_token as string,
+    {
+      enabled: status === "authenticated",
+    },
+  );
 
   if (status === "loading") {
     return (
@@ -75,8 +83,11 @@ const CardProfile = () => {
       {/* Profile Picture */}
       <div className="relative -mt-16 ml-4 flex h-[100px] w-[100px] justify-start rounded-full md:-mt-24 md:h-[150px] md:w-[150px]">
         <Image
-          src="/images/profile/profile.jpg"
-          alt="profile"
+          src={
+            buildFromAppURL(data?.data.profile_images) ??
+            "/images/profile/profile.jpg"
+          }
+          alt={session?.user.first_name || "profile"}
           fill
           className="rounded-full border-4 border-white object-cover shadow-md"
         />
@@ -88,7 +99,7 @@ const CardProfile = () => {
             {session?.user.first_name} {session?.user.last_name}
           </h2>
           <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
-            <p>UI/UX Designer</p>
+            <p>{data?.data.role}</p>
             <span className="opacity-30">|</span>
             <p className="text-sky-600">40+ Followers</p>
           </div>
@@ -112,13 +123,22 @@ const CardProfile = () => {
             About
           </CardTitle>
           <CardDescription className="mb-4 text-justify text-xs tracking-wider md:text-base">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit,
-            labore deserunt. Cupiditate odio assumenda consectetur perferendis
-            et velit facere quidem voluptas ut voluptatibus ad nesciunt esse
-            fuga, fugiat exercitationem unde debitis quisquam sed amet,
-            quibusdam nobis veniam. Exercitationem, adipisci minima quam
-            incidunt tempora provident voluptate porro, atque, ducimus vitae et!
+            {data?.data.about_description ?? "-"}
           </CardDescription>
+
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold">Skills</h3>
+            <div className="flex flex-wrap items-center gap-4">
+              {data?.data.skills.map((skill, i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <p className="text-sky-600">{skill}</p>
+                  {i < data.data.skills.length - 1 && (
+                    <span className="opacity-40">|</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="flex basis-full flex-row items-center gap-2 md:basis-1/5">
@@ -131,9 +151,9 @@ const CardProfile = () => {
           />
           <div className="flex flex-col gap-1">
             <h2 className="text-xs font-semibold md:text-sm">
-              Universitas Diponegoro
+              {data?.data.university ?? "-"}
             </h2>
-            <p className="text-xs">S1 Teknik Komputer</p>
+            <p className="text-xs">{data?.data.major ?? "-"}</p>
           </div>
         </div>
       </div>

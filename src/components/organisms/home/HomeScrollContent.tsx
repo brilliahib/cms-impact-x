@@ -1,17 +1,21 @@
-import CardListPost from "@/components/molecules/card/CardListPost";
+import CardListPost from "@/components/molecules/card/CardListFeed";
 import MessageInput from "@/components/molecules/message/MessageInput";
+import { useGetAllFeed } from "@/http/feeds/get-all-feed";
+import { useSession } from "next-auth/react";
 
 export default function HomeScrollContent() {
+  const { data: session, status } = useSession();
+
+  const { data: feed, isPending: feedIsPending } = useGetAllFeed(
+    session?.access_token as string,
+    {
+      enabled: status === "authenticated",
+    },
+  );
   return (
     <div className="flex flex-col gap-6">
       <MessageInput />
-      <CardListPost />
-      <CardListPost />
-      <CardListPost />
-      <CardListPost />
-      <CardListPost />
-      <CardListPost />
-      <CardListPost />
+      <CardListPost data={feed?.data} isPending={feedIsPending} />
     </div>
   );
 }
