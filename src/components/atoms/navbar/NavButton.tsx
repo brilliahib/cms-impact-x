@@ -21,6 +21,9 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { components } from "@/data/nav-items";
 import { Ellipsis } from "lucide-react";
+import { Session } from "next-auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { generateFallbackFromName } from "@/utils/generate-name";
 
 function MobileLink({
   href,
@@ -66,7 +69,11 @@ function MobileLink({
   );
 }
 
-export default function NavButton() {
+interface NavButtonProps {
+  session: Session;
+}
+
+export default function NavButton({ session }: NavButtonProps) {
   const pathname = usePathname();
   const isNavItemActive = useMemo(
     () => components.some((item) => pathname === item.href),
@@ -76,18 +83,29 @@ export default function NavButton() {
   return (
     <>
       <div className="hidden items-center gap-4 md:flex">
-        <div className="flex items-center gap-4">
-          <Link href="/login">
-            <Button size={"lg"} className="rounded-md">
-              Login
-            </Button>
-          </Link>
-          <Link href="/register">
-            <Button size={"lg"} className="rounded-md" variant={"outline"}>
-              Register
-            </Button>
-          </Link>
-        </div>
+        {session ? (
+          <Button size="icon" className="rounded-full border-0!">
+            <Avatar className="border-0">
+              <AvatarFallback className="border-0 text-gray-700">
+                {generateFallbackFromName(session.user.first_name)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="sr-only">Toggle user menu</span>
+          </Button>
+        ) : (
+          <div className="flex items-center gap-4">
+            <Link href="/login">
+              <Button size={"lg"} className="rounded-md">
+                Login
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button size={"lg"} className="rounded-md" variant={"outline"}>
+                Register
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2 md:hidden md:gap-0">

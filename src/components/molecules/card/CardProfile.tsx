@@ -1,9 +1,65 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Download, Settings } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 
 const CardProfile = () => {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return (
+      <Card className="w-full overflow-hidden p-0">
+        {/* Background */}
+        <div className="relative h-32 w-full md:h-44">
+          <Skeleton className="h-full w-full" />
+        </div>
+
+        {/* Profile Picture */}
+        <div className="relative -mt-16 ml-4 flex h-[100px] w-[100px] justify-start rounded-full md:-mt-24 md:h-[150px] md:w-[150px]">
+          <Skeleton className="h-full w-full rounded-full border-4 border-white shadow-md" />
+        </div>
+
+        <div className="-mt-0 flex flex-col items-start gap-4 px-6 md:-mt-24 md:flex-row md:items-center md:gap-6">
+          <div className="space-y-2 md:ml-40">
+            <Skeleton className="h-6 w-40" />
+            <div className="flex flex-row gap-4">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col gap-2 md:ml-auto md:w-auto md:flex-row">
+            <Skeleton className="h-10 w-full md:w-44" />
+            <Skeleton className="h-10 w-full md:w-32" />
+          </div>
+        </div>
+
+        <div className="flex flex-col justify-between gap-6 p-6 md:flex-row">
+          <div className="flex-1">
+            <CardTitle className="pb-2 text-base md:pb-4 md:text-lg">
+              <Skeleton className="h-6 w-20" />
+            </CardTitle>
+            <CardDescription className="mb-4 text-justify text-xs tracking-wider md:text-base">
+              <Skeleton className="h-20 w-full" />
+            </CardDescription>
+          </div>
+
+          <div className="flex basis-full flex-row items-center gap-2 md:basis-1/5">
+            <Skeleton className="h-[50px] w-[50px] rounded-md" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full overflow-hidden p-0">
       {/* Background */}
@@ -27,8 +83,10 @@ const CardProfile = () => {
       </div>
 
       <div className="-mt-0 flex flex-col items-start gap-4 px-6 md:-mt-24 md:flex-row md:items-center md:gap-6">
-        <div className="md:ml-40">
-          <h2 className="text-lg font-bold md:text-xl">John Doe</h2>
+        <div className="space-y-1 md:ml-40">
+          <h2 className="text-lg font-bold md:text-xl">
+            {session?.user.first_name} {session?.user.last_name}
+          </h2>
           <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
             <p>UI/UX Designer</p>
             <span className="opacity-30">|</span>
@@ -37,13 +95,13 @@ const CardProfile = () => {
         </div>
 
         <div className="flex w-full flex-col gap-2 md:ml-auto md:w-auto md:flex-row">
-          <Button className="w-full md:w-auto" variant={"outline"}>
-            <Settings />
-            Follow
-          </Button>
           <Button variant={"outline"}>
             <Download />
             Download Portofolio
+          </Button>
+          <Button className="w-full md:w-auto" variant={"outline"}>
+            <Settings />
+            Edit Profile
           </Button>
         </div>
       </div>
@@ -71,7 +129,7 @@ const CardProfile = () => {
             alt="undip"
             className="rounded-md"
           />
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             <h2 className="text-xs font-semibold md:text-sm">
               Universitas Diponegoro
             </h2>
