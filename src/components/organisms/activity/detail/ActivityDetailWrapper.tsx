@@ -36,7 +36,7 @@ export default function ActivityDetailWrapper({
         <div className="flex flex-col gap-4 md:w-1/3">
           <MessageInput />
           <CardTopPost />
-          <CardListDetailActivity />
+          <CardListDetailActivity id={id} />
         </div>
       </div>
     </>

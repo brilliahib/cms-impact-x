@@ -119,33 +119,42 @@ export default function CardAuthorActivity({
         <CardDescription>
           Participants who have joined your activity
         </CardDescription>
-        <div className="mt-4 space-y-4">
+        <div className="space-y-4 py-6">
           {data?.participants && data.participants.length > 0 ? (
-            <Card className="px-3 py-2">
-              <div className="flex items-center justify-between p-4">
-                <div className="flex flex-row items-center gap-2">
-                  <Image
-                    src={"/images/profile/profile-2d.png"}
-                    alt="Profile Image"
-                    width={50}
-                    height={50}
-                  />
-                  <div className="flex flex-col gap-1 text-sm">
-                    <p className="font-semibold">Bagus Tri Atmojo</p>
-                    <div className="text-muted-foreground flex flex-row gap-1">
-                      <p>UI/UX Designer</p>
-                      <span className="opacity-30">|</span>
-                      <p>Universitas Diponegoro</p>
+            data.participants.map((participant) => (
+              <Card className="px-3 py-2" key={participant.id}>
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex flex-row items-center gap-3">
+                    <Image
+                      src={
+                        participant.profile_images
+                          ? buildFromAppURL(participant.profile_images)
+                          : "/images/profile/profile-2d.png"
+                      }
+                      alt={participant.name ?? "Profile User"}
+                      width={50}
+                      height={50}
+                      className="rounded-full border"
+                    />
+                    <div className="flex flex-col gap-1 text-sm">
+                      <p className="font-semibold">{participant.name}</p>
+                      <div className="text-muted-foreground flex flex-row gap-1">
+                        <p>{participant.role} </p>
+                        <span className="opacity-30">|</span>
+                        <p>{participant.university}</p>
+                      </div>
                     </div>
                   </div>
+                  <div>
+                    <Ellipsis />
+                  </div>
                 </div>
-                <div>
-                  <Ellipsis />
-                </div>
-              </div>
-            </Card>
+              </Card>
+            ))
           ) : (
-            <p className="text-muted-foreground">No participants yet.</p>
+            <p className="text-muted-foreground text-sm">
+              No participants yet.
+            </p>
           )}
         </div>
       </CardHeader>
@@ -186,13 +195,15 @@ export default function CardAuthorActivity({
               </div>
             </div>
             <div>
-              <Image
-                src={"/images/activity/detail_activity.jpg"}
-                alt="detail"
-                className="rounded-lg"
-                width={300}
-                height={300}
-              />
+              {data?.images && (
+                <Image
+                  src={buildFromAppURL(data.images)}
+                  alt="Poster Activity"
+                  className="rounded-lg"
+                  width={300}
+                  height={300}
+                />
+              )}
             </div>
           </div>
         </CardHeader>
