@@ -4,14 +4,7 @@ import { useGetAllFeed } from "@/http/feeds/get-all-feed";
 import { useSession } from "next-auth/react";
 
 export default function HomeScrollContent() {
-  const { data: session, status } = useSession();
-
-  const { data: feed, isPending: feedIsPending } = useGetAllFeed(
-    session?.access_token as string,
-    {
-      enabled: status === "authenticated",
-    },
-  );
+  const { data: feed, isPending: feedIsPending } = useGetAllFeed();
   return (
     <div className="flex flex-col gap-6">
       <MessageInput />

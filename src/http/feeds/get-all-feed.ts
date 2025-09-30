@@ -7,25 +7,18 @@ interface GetAllFeedResponse {
   data: Feed[];
 }
 
-export const GetAllFeedHandler = async (
-  token: string,
-): Promise<GetAllFeedResponse> => {
-  const { data } = await api.get<GetAllFeedResponse>(`/feeds`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const GetAllFeedHandler = async (): Promise<GetAllFeedResponse> => {
+  const { data } = await api.get<GetAllFeedResponse>(`/feeds`, {});
 
   return data;
 };
 
 export const useGetAllFeed = (
-  token: string,
   options?: Partial<UseQueryOptions<GetAllFeedResponse, AxiosError>>,
 ) => {
   return useQuery({
-    queryKey: ["feed-user", token],
-    queryFn: () => GetAllFeedHandler(token),
+    queryKey: ["get-all-feed"],
+    queryFn: () => GetAllFeedHandler(),
     ...options,
   });
 };

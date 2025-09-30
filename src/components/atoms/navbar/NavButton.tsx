@@ -20,10 +20,17 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { components } from "@/data/nav-items";
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, LogOut, User } from "lucide-react";
 import { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { generateFallbackFromName } from "@/utils/generate-name";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { signOut } from "next-auth/react";
 
 function MobileLink({
   href,
@@ -84,14 +91,31 @@ export default function NavButton({ session }: NavButtonProps) {
     <>
       <div className="hidden items-center gap-4 md:flex">
         {session ? (
-          <Button size="icon" className="rounded-full border-0!">
-            <Avatar className="border-0">
-              <AvatarFallback className="border-0 text-gray-700">
-                {generateFallbackFromName(session.user.first_name)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="sr-only">Toggle user menu</span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button size="icon" className="rounded-full border-0!">
+                <Avatar className="border-0">
+                  <AvatarFallback className="border-0 text-gray-700">
+                    {generateFallbackFromName(session.user.first_name)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="sr-only">Toggle user menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                Profile
+                <User />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer"
+              >
+                <LogOut className="text-destructive" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
           <div className="flex items-center gap-4">
             <Link href="/login">
