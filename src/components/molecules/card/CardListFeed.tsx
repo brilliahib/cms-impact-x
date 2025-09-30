@@ -10,6 +10,8 @@ import { Ellipsis, MessageCircleMore, ThumbsUp } from "lucide-react";
 import Image from "next/image";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { buildFromAppURL } from "@/utils/misc";
+import Link from "next/link";
 
 interface CardListFeedProps {
   data?: Feed[];
@@ -59,16 +61,36 @@ export default function CardListFeed({ data, isPending }: CardListFeedProps) {
                 <div className="flex justify-between">
                   <div className="flex items-center gap-3">
                     <Image
-                      src={"/images/profile/profile-2d.png"}
-                      alt="Profile Dummy"
+                      src={
+                        feed?.user.profile_images
+                          ? buildFromAppURL(feed.user.profile_images)
+                          : "/images/profile/profile-2d.png"
+                      }
+                      alt={feed?.user.name ?? "Profile User"}
                       width={50}
                       height={50}
-                      className="rounded-full"
+                      className="rounded-full border"
                     />
                     <div className="flex flex-col gap-1">
-                      <h1 className="font-medium">{feed.user.name}</h1>
+                      <Link
+                        href={`/profile/${feed.user.username}`}
+                        className="hover:underline"
+                      >
+                        <h1 className="font-medium">{feed.user.name}</h1>
+                      </Link>
                       <span className="text-muted-foreground text-sm">
-                        {feed.user.role} | {feed.user.university}
+                        {feed?.user &&
+                        (feed.user.role || feed.user.university) ? (
+                          <>
+                            {feed.user.role ?? ""}
+                            {feed.user.role && feed.user.university
+                              ? " | "
+                              : ""}
+                            {feed.user.university ?? ""}
+                          </>
+                        ) : (
+                          ""
+                        )}
                       </span>
                       <p className="text-muted-foreground text-xs">
                         {format(new Date(feed.created_at), "d MMMM yyyy", {
