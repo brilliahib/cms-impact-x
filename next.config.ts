@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ["api-impactx.brilliahib.tech"]
+  }
 };
 
 export default nextConfig;
