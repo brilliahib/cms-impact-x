@@ -1,27 +1,27 @@
-import FormChangePassword from "@/components/molecules/form/password/FormChangePassword";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import FormCreateFeed from "../../form/feeds/FormCreateFeed";
 
-interface DialogChangePasswordProps {
+interface DialogCreateFeedProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
 
-export default function DialogChangePassword({
+export default function DialogCreateFeed({
   open,
   setOpen,
-}: DialogChangePasswordProps) {
+}: DialogCreateFeedProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Change Password</DialogTitle>
+          <DialogTitle>Create Feed</DialogTitle>
         </DialogHeader>
-        <FormChangePassword />
+        <FormCreateFeed setOpen={setOpen} />
       </DialogContent>
     </Dialog>
   );

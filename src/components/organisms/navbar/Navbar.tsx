@@ -3,8 +3,13 @@
 import NavL from "@/components/atoms/navbar/NavL";
 import NavButton from "@/components/atoms/navbar/NavButton";
 import NavLink from "@/components/atoms/navbar/NavLink";
+import { Session } from "next-auth";
 
-export default function Navbar() {
+interface NavbarProps {
+  session: Session;
+}
+
+export default function Navbar({ session }: NavbarProps) {
   return (
     <div className="fixed top-0 left-0 z-40 w-full border-b bg-white">
       <div className="pad-x-xl flex justify-between py-4">
@@ -12,7 +17,7 @@ export default function Navbar() {
         <nav className="hidden items-center font-semibold md:flex">
           <NavLink />
         </nav>
-        <NavButton />
+        <NavButton session={session} />
       </div>
     </div>
   );
