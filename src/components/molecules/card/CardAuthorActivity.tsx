@@ -6,25 +6,106 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Activity } from "@/types/activity/activity";
+import { buildFromAppURL } from "@/utils/misc";
+import { format } from "date-fns";
 import { Clock3, Ellipsis, MapPin, UsersRound } from "lucide-react";
 import Image from "next/image";
+import { id } from "date-fns/locale";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function CardAuthorActivity() {
+interface CardAuthorActivityProps {
+  data?: Activity;
+  isPending?: boolean;
+}
+
+export default function CardAuthorActivity({
+  data,
+  isPending,
+}: CardAuthorActivityProps) {
+  if (isPending) {
+    return (
+      <Card>
+        <CardHeader className="border-b-2 pb-4">
+          <div className="flex justify-between">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-40" />
+              </div>
+            </div>
+            <Skeleton className="h-5 w-5 rounded-md" />
+          </div>
+        </CardHeader>
+
+        <CardHeader className="border-b-2 pb-4">
+          <Skeleton className="h-5 w-20" />
+          <Skeleton className="mt-2 h-4 w-56" />
+          <div className="mt-4">
+            <Skeleton className="h-16 w-full rounded-lg" />
+          </div>
+        </CardHeader>
+
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="space-y-4">
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-4 w-64" />
+              <div className="flex gap-2">
+                <Skeleton className="h-6 w-16 rounded-full" />
+                <Skeleton className="h-6 w-16 rounded-full" />
+              </div>
+            </div>
+            <Skeleton className="h-24 w-40 rounded-lg" />
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          <div className="flex flex-row justify-between gap-4">
+            <Skeleton className="h-20 w-full rounded-lg" />
+            <Skeleton className="h-20 w-full rounded-lg" />
+            <Skeleton className="h-20 w-full rounded-lg" />
+          </div>
+          <div>
+            <Skeleton className="mb-2 h-5 w-32" />
+            <Skeleton className="h-16 w-full" />
+          </div>
+          <div className="flex flex-row gap-4">
+            <div className="flex flex-1 flex-col gap-2">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+            <div className="flex flex-1 flex-col gap-2">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader className="border-b-2 pb-4">
         <div className="flex justify-between">
           <div className="flex items-center gap-3">
             <Image
-              src={"/images/profile/profile-2d.png"}
-              alt="Profile Dummy"
+              src={
+                data?.user.profile_images
+                  ? buildFromAppURL(data.user.profile_images)
+                  : "/images/profile/profile-2d.png"
+              }
+              alt={data?.user.name ?? "Profile User"}
               width={50}
               height={50}
+              className="rounded-full border"
             />
             <div className="flex flex-col gap-1">
-              <h1 className="font-medium">Bagus Tri Atmojo</h1>
+              <h1 className="font-medium">{data?.user.name}</h1>
               <span className="text-muted-foreground text-sm">
-                UI/UX Designer | Universitas Diponegoro
+                {data?.user.role ?? ""} | {data?.user.university ?? ""}
               </span>
             </div>
           </div>
@@ -39,157 +120,142 @@ export default function CardAuthorActivity() {
           Participants who have joined your activity
         </CardDescription>
         <div className="mt-4 space-y-4">
-          <Card>
-            <div className="flex items-center justify-between p-4">
-              <div className="flex flex-row items-center gap-2">
-                <Image
-                  src={"/images/profile/profile-2d.png"}
-                  alt="Profile Image"
-                  width={50}
-                  height={50}
-                />
-                <div className="flex flex-col gap-1 text-sm">
-                  <p className="font-semibold">Bagus Tri Atmojo</p>
-                  <div className="text-muted-foreground flex flex-row gap-1">
-                    <p>UI/UX Designer</p>
-                    <span className="opacity-30">|</span>
-                    <p>Universitas Diponegoro</p>
+          {data?.participants && data.participants.length > 0 ? (
+            <Card className="px-3 py-2">
+              <div className="flex items-center justify-between p-4">
+                <div className="flex flex-row items-center gap-2">
+                  <Image
+                    src={"/images/profile/profile-2d.png"}
+                    alt="Profile Image"
+                    width={50}
+                    height={50}
+                  />
+                  <div className="flex flex-col gap-1 text-sm">
+                    <p className="font-semibold">Bagus Tri Atmojo</p>
+                    <div className="text-muted-foreground flex flex-row gap-1">
+                      <p>UI/UX Designer</p>
+                      <span className="opacity-30">|</span>
+                      <p>Universitas Diponegoro</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div>
-                <Ellipsis />
-              </div>
-            </div>
-          </Card>
-          <Card>
-            <div className="flex items-center justify-between p-4">
-              <div className="flex flex-row items-center gap-2">
-                <Image
-                  src={"/images/profile/profile-2d.png"}
-                  alt="Profile Image"
-                  width={50}
-                  height={50}
-                />
-                <div className="flex flex-col gap-1 text-sm">
-                  <p className="font-semibold">Bagus Tri Atmojo</p>
-                  <div className="text-muted-foreground flex flex-row gap-1">
-                    <p>UI/UX Designer</p>
-                    <span className="opacity-30">|</span>
-                    <p>Universitas Diponegoro</p>
-                  </div>
+                <div>
+                  <Ellipsis />
                 </div>
               </div>
-              <div>
-                <Ellipsis />
-              </div>
-            </div>
-          </Card>
+            </Card>
+          ) : (
+            <p className="text-muted-foreground">No participants yet.</p>
+          )}
         </div>
       </CardHeader>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <div className="flex flex-row items-center gap-2">
-              <CardTitle className="text-xl">
-                Lorem ipsum dolor sit amet, lorem ipsum dolor
-              </CardTitle>
-              <Badge
-                variant={"default"}
-                className="bg-green-100 text-lg text-green-700"
-              >
-                3/4
-              </Badge>
+      <div className="space-y-6">
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="space-y-2">
+              <div>
+                <div className="flex flex-row items-center gap-8">
+                  <CardTitle className="text-xl">{data?.title}</CardTitle>
+                  <Badge
+                    variant={"default"}
+                    className="rounded-full bg-green-100 px-4 text-base text-green-700"
+                  >
+                    {data?.total_participants}/{data?.max_participants}
+                  </Badge>
+                </div>
+                <CardDescription className="text-muted-foreground py-2">
+                  {data?.created_at && (
+                    <p>
+                      Posted on:{" "}
+                      {format(new Date(data?.created_at), "d MMMM yyyy", {
+                        locale: id,
+                      })}
+                    </p>
+                  )}
+                </CardDescription>
+              </div>
+              <div className="flex w-3/4 flex-wrap gap-2">
+                <Badge>{data?.activity_type}</Badge>
+                <div>
+                  {data?.activity_category.map((category, index) => (
+                    <Badge key={index} variant={"secondary"}>
+                      {category}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             </div>
-            <CardDescription className="text-muted-foreground py-2 font-medium">
-              Posted on: 26 Sept 2025
-            </CardDescription>
-            <div className="flex w-3/4 flex-wrap gap-2">
-              <Badge>Project</Badge>
-              <Badge variant={"secondary"}>Category 1</Badge>
-              <Badge variant={"secondary"}>Category 1</Badge>
-              <Badge variant={"secondary"}>Category 1</Badge>
-              <Badge variant={"secondary"}>Category 1</Badge>
-              <Badge variant={"secondary"}>Category 1</Badge>
-              <Badge variant={"secondary"}>Category 1</Badge>
-              <Badge variant={"secondary"}>Category 1</Badge>
-              <Badge variant={"secondary"}>Category 1</Badge>
+            <div>
+              <Image
+                src={"/images/activity/detail_activity.jpg"}
+                alt="detail"
+                className="rounded-lg"
+                width={300}
+                height={300}
+              />
             </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex flex-row justify-between gap-4">
+            <Card className="flex-1 p-4">
+              <div className="flex items-center gap-2">
+                <MapPin size={20} />
+                <h1 className="text-sm font-medium">Location</h1>
+              </div>
+              <p className="font-medium">{data?.location ?? ""}</p>
+            </Card>
+
+            <Card className="flex-1 p-4">
+              <div className="flex gap-2">
+                <Clock3 size={20} />
+                <h1 className="text-sm font-medium">Duration</h1>
+              </div>
+              {data?.start_date && data?.end_date && (
+                <p className="font-medium">
+                  {format(new Date(data.start_date), "d MMMM yyyy", {
+                    locale: id,
+                  })}{" "}
+                  -{" "}
+                  {format(new Date(data.end_date), "d MMMM yyyy", {
+                    locale: id,
+                  })}
+                </p>
+              )}
+            </Card>
+
+            <Card className="flex-1 p-4">
+              <div className="flex gap-2">
+                <UsersRound size={20} />
+                <h1 className="text-sm font-medium">Max Participants</h1>
+              </div>
+              <p className="font-medium">
+                {data?.max_participants ?? 0} People
+              </p>
+            </Card>
           </div>
           <div>
-            <Image
-              src={"/images/activity/detail_activity.jpg"}
-              alt="detail"
-              className="rounded-lg"
-              width={300}
-              height={300}
-            />
+            <h1 className="pb-2 font-bold">Description</h1>
+            <p className="text-muted-foreground text-justify">
+              {data?.description ?? "No description available."}
+            </p>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-row justify-between gap-4">
-          <Card className="flex-1 p-4">
-            <div className="flex gap-1">
-              <MapPin />
-              <h1>Location</h1>
+          <div className="flex flex-row">
+            <div className="flex flex-1 flex-col gap-2">
+              <h1 className="font-bold">Requirements</h1>
+              <p className="text-muted-foreground">
+                {data?.requirements ?? "No requirements available."}
+              </p>
             </div>
-            <p>Tembalang, Semarang, Indonesia</p>
-          </Card>
-
-          <Card className="flex-1 p-4">
-            <div className="flex gap-1">
-              <Clock3 />
-              <h1>Duration</h1>
+            <div className="flex flex-1 flex-col gap-2">
+              <h1 className="font-bold">Benefits</h1>
+              <p className="text-muted-foreground">
+                {data?.benefits ?? "No benefits available."}
+              </p>
             </div>
-            <p>26 Sept - 05 Okt 2025</p>
-          </Card>
-
-          <Card className="flex-1 p-4">
-            <div className="flex gap-1">
-              <UsersRound />
-              <h1>Max Participants</h1>
-            </div>
-            <p>4 People</p>
-          </Card>
-        </div>
-        <div className="my-4">
-          <h1 className="pb-2 font-bold">Description</h1>
-          <p className="text-justify text-pretty">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Pellentesque dui nisi, accumsan et magna quis, imperdiet congue
-            dolor. Nam felis diam, vestibulum faucibus molestie at, bibendum
-            vitae leo. In a bibendum nibh. Maecenas maximus nisl at aliquet
-            tempor. Vestibulum sem felis, porta ut ex in, pharetra lacinia leo.
-            Curabitur pulvinar massa mi, vitae maximus nisi blandit vel. Sed
-            porta consectetur massa, quis ornare eros vehicula sit amet.
-            Pellentesque dapibus a justo sed aliquet. Mauris leo diam,
-            vestibulum in ante eu, tempus finibus nisi.
-          </p>
-        </div>
-        <div className="flex flex-row">
-          <div className="flex-1">
-            <h1 className="font-bold">Requirements</h1>
-            <ul className="ml-6 list-inside list-disc">
-              <li>Test</li>
-              <li>Test</li>
-              <li>Test</li>
-              <li>Test</li>
-              <li>Test</li>
-            </ul>
           </div>
-          <div className="flex-1">
-            <h1 className="font-bold">Benefits</h1>
-            <ul className="ml-6 list-inside list-disc">
-              <li>Test</li>
-              <li>Test</li>
-              <li>Test</li>
-              <li>Test</li>
-              <li>Test</li>
-            </ul>
-          </div>
-        </div>
-      </CardContent>
+        </CardContent>
+      </div>
     </Card>
   );
 }

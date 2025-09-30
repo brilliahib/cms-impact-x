@@ -47,7 +47,7 @@ export function FormAuthLogin({
     setIsLoading(false);
 
     if (!res || res.error) {
-      toast.error("Login Gagal", {
+      toast.error("Login Failed!", {
         description:
           res?.error === "CredentialsSignin"
             ? "Invalid email or password."
@@ -56,7 +56,7 @@ export function FormAuthLogin({
       return;
     }
 
-    toast.success("Login Berhasil!", {
+    toast.success("Login Successful!", {
       description: "You have successfully logged in to your account.",
     });
 
