@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +24,7 @@ import Image from "next/image";
 import { components } from "@/data/nav-items";
 import { Ellipsis, LogOut, User } from "lucide-react";
 import { Session } from "next-auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { generateFallbackFromName } from "@/utils/generate-name";
 import {
   DropdownMenu,
@@ -31,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function MobileLink({
   href,
@@ -77,10 +80,11 @@ function MobileLink({
 }
 
 interface NavButtonProps {
-  session: Session;
+  session?: Session | null;
+  isPending?: boolean;
 }
 
-export default function NavButton({ session }: NavButtonProps) {
+export default function NavButton({ session, isPending }: NavButtonProps) {
   const pathname = usePathname();
   const isNavItemActive = useMemo(
     () => components.some((item) => pathname === item.href),
@@ -89,8 +93,14 @@ export default function NavButton({ session }: NavButtonProps) {
 
   return (
     <>
+      {/* Desktop */}
       <div className="hidden items-center gap-4 md:flex">
-        {session ? (
+        {isPending ? (
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-10 w-20 rounded-md" />
+            <Skeleton className="h-10 w-24 rounded-md" />
+          </div>
+        ) : session ? (
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Button size="icon" className="rounded-full border-0!">
@@ -102,10 +112,10 @@ export default function NavButton({ session }: NavButtonProps) {
                 <span className="sr-only">Toggle user menu</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="end">
               <DropdownMenuItem>
-                Profile
                 <User />
+                Profile
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => signOut({ callbackUrl: "/login" })}
@@ -132,9 +142,9 @@ export default function NavButton({ session }: NavButtonProps) {
         )}
       </div>
 
+      {/* Mobile */}
       <div className="flex items-center gap-2 md:hidden md:gap-0">
         <Sheet>
-          {/* Hamburger */}
           <SheetTrigger asChild>
             <Button
               variant="ghost"
@@ -197,26 +207,35 @@ export default function NavButton({ session }: NavButtonProps) {
               </MobileLink>
             </nav>
             <SheetFooter>
-              <Link
-                href="/login"
-                className="flex items-center justify-center gap-2 text-left font-semibold"
-              >
-                <Button size={"lg"} className="w-full rounded-md">
-                  Login
-                </Button>
-              </Link>
-              <Link
-                href="/register"
-                className="flex items-center justify-center gap-2 text-left font-semibold"
-              >
-                <Button
-                  size={"lg"}
-                  className="w-full rounded-md"
-                  variant={"outline"}
-                >
-                  Register
-                </Button>
-              </Link>
+              {isPending ? (
+                <div className="flex w-full flex-col gap-2">
+                  <Skeleton className="h-10 w-full rounded-md" />
+                  <Skeleton className="h-10 w-full rounded-md" />
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="flex items-center justify-center gap-2 text-left font-semibold"
+                  >
+                    <Button size={"lg"} className="w-full rounded-md">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="flex items-center justify-center gap-2 text-left font-semibold"
+                  >
+                    <Button
+                      size={"lg"}
+                      className="w-full rounded-md"
+                      variant={"outline"}
+                    >
+                      Register
+                    </Button>
+                  </Link>
+                </>
+              )}
             </SheetFooter>
           </SheetContent>
         </Sheet>

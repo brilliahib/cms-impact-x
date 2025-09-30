@@ -6,9 +6,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useGetProfileSummary } from "@/http/profile/get-use-profile-user";
+import { buildFromAppURL } from "@/utils/misc";
 
 export default function CardProfileFeed() {
   const { data: session, status } = useSession();
+  const { data, isPending } = useGetProfileSummary(
+    session?.access_token as string,
+    {
+      enabled: status === "authenticated",
+    },
+  );
 
   // Kondisi loading
   if (status === "loading") {
@@ -52,9 +60,14 @@ export default function CardProfileFeed() {
       <div className="relative mx-auto -mt-20 flex h-[100px] w-[100px] md:h-[100px] md:w-[100px]">
         {session ? (
           <Image
-            src="/images/profile/profile.jpg"
-            alt="profile"
-            fill
+            src={
+              data?.data.profile?.profile_images
+                ? buildFromAppURL(data.data.profile.profile_images)
+                : "/images/profile/profile-2d.png"
+            }
+            alt={data?.data.first_name ?? "Profile User"}
+            width={100}
+            height={100}
             className="rounded-full border-4 border-white object-cover shadow-md"
           />
         ) : (
@@ -70,11 +83,20 @@ export default function CardProfileFeed() {
       <CardContent>
         {session ? (
           <div className="flex flex-col items-center gap-3 text-center">
-            <h1 className="text-lg font-semibold">
-              {session.user.first_name} {session.user.last_name}
-            </h1>
+            <Link href={`/profile`} className="hover:underline">
+              <h1 className="text-lg font-semibold">
+                {session.user.first_name} {session.user.last_name}
+              </h1>
+            </Link>
             <span className="text-muted-foreground text-sm">
-              UI/UX Designer | Universitas Diponegoro
+              {data?.data.profile ? (
+                <>
+                  {data.data.profile.role ?? ""} |{" "}
+                  {data.data.profile.university ?? ""}
+                </>
+              ) : (
+                ""
+              )}
             </span>
             <p className="text-sm text-[#0284C7]">40+ Followers</p>
           </div>

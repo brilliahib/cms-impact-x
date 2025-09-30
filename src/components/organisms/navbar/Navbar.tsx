@@ -7,9 +7,10 @@ import { Session } from "next-auth";
 
 interface NavbarProps {
   session: Session;
+  isPending?: boolean;
 }
 
-export default function Navbar({ session }: NavbarProps) {
+export default function Navbar({ session, isPending }: NavbarProps) {
   return (
     <div className="fixed top-0 left-0 z-40 w-full border-b bg-white">
       <div className="pad-x-xl flex justify-between py-4">
@@ -17,7 +18,7 @@ export default function Navbar({ session }: NavbarProps) {
         <nav className="hidden items-center font-semibold md:flex">
           <NavLink />
         </nav>
-        <NavButton session={session} />
+        <NavButton session={session} isPending={isPending} />
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ export default function Home() {
   const { data: session, status } = useSession();
   return (
     <>
-      <Navbar session={session!} />
+      <Navbar session={session!} isPending={status === "loading"} />
       <main className="pad-x-xl my-24">
         <HomeWrapper />
       </main>
