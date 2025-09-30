@@ -3,13 +3,20 @@ import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { useState } from "react";
 import DialogCreateFeed from "../dialog/feeds/DialogCreateFeed";
+import { useSession } from "next-auth/react";
 
 export default function MessageInput() {
   const [isDialogCreateFeedOpen, setIsDialogCreateFeedOpen] = useState(false);
 
+  const { data: session, status } = useSession();
+
   const handleDialogCreateFeedOpen = () => {
     setIsDialogCreateFeedOpen(true);
   };
+
+  if (!session && status !== "loading") {
+    return null;
+  }
 
   return (
     <>

@@ -14,6 +14,7 @@ import { Plus } from "lucide-react";
 import { useGetAllActivityUser } from "@/http/activity/get-all-activity-user";
 import CardListActivity from "@/components/molecules/card/CardListActivity";
 import DialogCreateFeed from "@/components/molecules/dialog/feeds/DialogCreateFeed";
+import DialogCreateActivity from "@/components/molecules/dialog/activity/DialogCreateActivity";
 
 interface ProfileScrollContentProps {
   profile?: ProfileUser;
@@ -53,6 +54,10 @@ export default function ProfileScrollContent({
     setIsDialogCreateFeedOpen(true);
   };
 
+  const handleDialogCreateActivityOpen = () => {
+    setIsDialogCreateActivityOpen(true);
+  };
+
   return (
     <>
       <div className="flex w-full flex-col gap-6 md:flex-row">
@@ -76,7 +81,10 @@ export default function ProfileScrollContent({
                 </Button>
               )}
               {activeTab === "activity" && (
-                <Button variant="outline">
+                <Button
+                  variant="outline"
+                  onClick={handleDialogCreateActivityOpen}
+                >
                   Create Activity <Plus />
                 </Button>
               )}
@@ -97,6 +105,11 @@ export default function ProfileScrollContent({
       <DialogCreateFeed
         open={isDialogCreateFeedOpen}
         setOpen={setIsDialogCreateFeedOpen}
+      />
+
+      <DialogCreateActivity
+        open={isDialogCreateActivityOpen}
+        setOpen={setIsDialogCreateActivityOpen}
       />
     </>
   );

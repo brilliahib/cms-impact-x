@@ -22,18 +22,24 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { components } from "@/data/nav-items";
-import { Ellipsis, LogOut, User } from "lucide-react";
+import { Ellipsis, LogOut, Settings, Settings2, User } from "lucide-react";
 import { Session } from "next-auth";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { generateFallbackFromName } from "@/utils/generate-name";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useGetProfileSummary } from "@/http/profile/get-use-profile-user";
+import { buildFromAppURL } from "@/utils/misc";
 
 function MobileLink({
   href,
@@ -91,6 +97,13 @@ export default function NavButton({ session, isPending }: NavButtonProps) {
     [pathname],
   );
 
+  const { data, isPending: isProfilePending } = useGetProfileSummary(
+    session?.access_token as string,
+    {
+      enabled: !!session,
+    },
+  );
+
   return (
     <>
       {/* Desktop */}
@@ -105,6 +118,9 @@ export default function NavButton({ session, isPending }: NavButtonProps) {
             <DropdownMenuTrigger>
               <Button size="icon" className="rounded-full border-0!">
                 <Avatar className="border-0">
+                  <AvatarImage
+                    src={buildFromAppURL(data?.data.profile.profile_images)}
+                  />
                   <AvatarFallback className="border-0 text-gray-700">
                     {generateFallbackFromName(session.user.first_name)}
                   </AvatarFallback>
@@ -113,10 +129,32 @@ export default function NavButton({ session, isPending }: NavButtonProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <User />
-                Profile
-              </DropdownMenuItem>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <Link href="/profile" className="flex items-center gap-2">
+                    <User /> Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link
+                    href="/profile/edit"
+                    className="flex items-center gap-2"
+                  >
+                    <Settings2 /> Account
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link
+                    href="/profile/security"
+                    className="flex items-center gap-2"
+                  >
+                    <Settings />
+                    Security & Privacy
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => signOut({ callbackUrl: "/login" })}
                 className="text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer"
