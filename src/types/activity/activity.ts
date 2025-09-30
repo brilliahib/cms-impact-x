@@ -5,7 +5,7 @@ export interface Activity {
   user_id: number;
   title: string;
   activity_type: string;
-  activity_category: string;
+  activity_category: string[];
   images: string;
   location: string;
   start_date: Date;

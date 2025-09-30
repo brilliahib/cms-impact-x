@@ -71,11 +71,19 @@ export default function CardCurrentActivity({
                 <CardHeader className="flex justify-between border-b p-2 pb-4!">
                   <div className="flex flex-col gap-1">
                     <CardTitle className="text-sm">{activity.title}</CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Badge>{activity.activity_type}</Badge>
-                      <Badge variant={"secondary"}>
-                        {activity.activity_category}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className="capitalize">
+                        {activity.activity_type}
                       </Badge>
+                      {activity.activity_category.map((category, index) => (
+                        <Badge
+                          key={index}
+                          variant={"outline"}
+                          className="capitalize"
+                        >
+                          {category}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                   <div>
