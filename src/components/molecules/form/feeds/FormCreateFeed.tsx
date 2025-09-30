@@ -30,6 +30,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import DialogCreateActivity from "../../dialog/activity/DialogCreateActivity";
 
 interface FormCreateFeedProps {
   setOpen: (open: boolean) => void;
@@ -84,7 +85,6 @@ export default function FormCreateFeed({ setOpen }: FormCreateFeedProps) {
 
   const handleDialogCreateActivityOpen = () => {
     setIsDialogCreateActivityOpen(true);
-    setOpen(false);
   };
 
   const onSubmit = (body: FeedType) => {
@@ -185,7 +185,7 @@ export default function FormCreateFeed({ setOpen }: FormCreateFeedProps) {
             <p className="text-muted-foreground text-sm">
               Or you can create a new activity here.{" "}
               <span
-                className="text-sky-600"
+                className="cursor-pointer text-sky-600 hover:underline"
                 onClick={handleDialogCreateActivityOpen}
               >
                 Create Activity
@@ -200,6 +200,11 @@ export default function FormCreateFeed({ setOpen }: FormCreateFeedProps) {
           </div>
         </form>
       </Form>
+
+      <DialogCreateActivity
+        open={isDialogCreateActivityOpen}
+        setOpen={setIsDialogCreateActivityOpen}
+      />
     </>
   );
 }

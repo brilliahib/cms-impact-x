@@ -65,10 +65,18 @@ export default function CardListActivity({
                 <div className="space-y-4">
                   <CardTitle>{activity.title}</CardTitle>
                   <div className="flex flex-row gap-2">
-                    <Badge>{activity.activity_type}</Badge>
-                    <Badge variant={"outline"}>
-                      {activity.activity_category}
+                    <Badge className="capitalize">
+                      {activity.activity_type}
                     </Badge>
+                    {activity.activity_category.map((category, index) => (
+                      <Badge
+                        key={index}
+                        variant={"outline"}
+                        className="capitalize"
+                      >
+                        {category}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
                 <div className="flex flex-row gap-4">
