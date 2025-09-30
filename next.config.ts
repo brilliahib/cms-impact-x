@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["api-impactx.brilliahib.tech"]
+    domains: ["api-impactx.brilliahib.tech", "127.0.0.1"]
   }
 };
 
