@@ -3,23 +3,28 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetProfileUser } from "@/http/profile/get-profile-user";
+import { useGetProfileByUsername } from "@/http/profile/get-profile-by-username";
 import { buildFromAppURL } from "@/utils/misc";
-import { Download, Settings } from "lucide-react";
+import { Download, Plus, Settings } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
-const CardProfile = () => {
+interface CardProfileByUsernameProps {
+  username: string;
+}
+
+const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
   const { data: session, status } = useSession();
-  const { data, isPending } = useGetProfileUser(
+  const { data, isPending } = useGetProfileByUsername(
+    username,
     session?.access_token as string,
     {
       enabled: status === "authenticated",
     },
   );
 
-  if (status === "loading") {
+  if (status === "loading" || isPending) {
     return (
       <Card className="w-full overflow-hidden p-0">
         {/* Background */}
@@ -85,10 +90,11 @@ const CardProfile = () => {
       <div className="relative -mt-16 ml-4 flex h-[100px] w-[100px] justify-start rounded-full md:-mt-24 md:h-[150px] md:w-[150px]">
         <Image
           src={
-            buildFromAppURL(data?.data.profile_images) ??
-            "/images/profile/profile.jpg"
+            data?.data && data.data.profile_images
+              ? buildFromAppURL(data.data.profile_images)
+              : "/images/profile/profile-2d.png"
           }
-          alt={session?.user.first_name || "profile"}
+          alt="Tidak dapat dimuat"
           fill
           className="rounded-full border-4 border-white object-cover shadow-md"
         />
@@ -100,23 +106,41 @@ const CardProfile = () => {
             {session?.user.first_name} {session?.user.last_name}
           </h2>
           <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
-            <p>{data?.data.role}</p>
+            <p>{data?.data && data.data.role ? data.data.role : "-"}</p>
             <span className="opacity-30">|</span>
             <p className="text-sky-600">40+ Followers</p>
           </div>
         </div>
 
         <div className="flex w-full flex-col gap-2 md:ml-auto md:w-auto md:flex-row">
-          <Button variant={"outline"}>
-            <Download />
-            Download Portofolio
-          </Button>
-          <Button className="w-full md:w-auto" variant="outline">
-            <Link href={"/profile/edit"} className="flex items-center gap-2">
-              <Settings />
-              Edit Profile
-            </Link>
-          </Button>
+          {session?.user.id === data?.data?.user_id ? (
+            <>
+              <Button variant={"outline"}>
+                <Download />
+                Download Portofolio
+              </Button>
+              <Button className="w-full md:w-auto" variant="outline">
+                <Link
+                  href={"/profile/edit"}
+                  className="flex items-center gap-2"
+                >
+                  <Settings />
+                  Edit Profile
+                </Link>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button className="w-full md:w-auto">
+                <Plus />
+                Follow
+              </Button>
+              <Button variant={"outline"}>
+                <Download />
+                Download Portofolio
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -126,20 +150,26 @@ const CardProfile = () => {
             About
           </CardTitle>
           <CardDescription className="mb-4 text-justify text-xs tracking-wider md:text-base">
-            {data?.data.about_description ?? "-"}
+            {data?.data && data.data.about_description
+              ? data.data.about_description
+              : "-"}
           </CardDescription>
 
           <div className="space-y-2">
             <h3 className="text-lg font-semibold">Skills</h3>
             <div className="flex flex-wrap items-center gap-4">
-              {data?.data.skills.map((skill, i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <p className="text-sky-600">{skill}</p>
-                  {i < data.data.skills.length - 1 && (
-                    <span className="opacity-40">|</span>
-                  )}
-                </div>
-              ))}
+              {data?.data?.skills?.length ? (
+                data.data.skills.map((skill, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <p className="text-sky-600">{skill}</p>
+                    {i < data.data.skills.length - 1 && (
+                      <span className="opacity-40">|</span>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-muted-foreground text-sm">-</p>
+              )}
             </div>
           </div>
         </div>
@@ -154,9 +184,11 @@ const CardProfile = () => {
           />
           <div className="flex flex-col gap-1">
             <h2 className="text-xs font-semibold md:text-sm">
-              {data?.data.university ?? "-"}
+              {data?.data && data.data.university ? data.data.university : "-"}
             </h2>
-            <p className="text-xs">{data?.data.major ?? "-"}</p>
+            <p className="text-xs">
+              {data?.data && data.data.major ? data.data.major : "-"}
+            </p>
           </div>
         </div>
       </div>
@@ -164,4 +196,4 @@ const CardProfile = () => {
   );
 };
 
-export default CardProfile;
+export default CardProfileByUsername;

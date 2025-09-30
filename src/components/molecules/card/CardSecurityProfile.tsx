@@ -1,6 +1,5 @@
 "use client";
 
-import DialogChangePassword from "@/components/atoms/dialog/DialogChangePassword";
 import {
   Card,
   CardContent,
@@ -70,12 +69,12 @@ export default function CardSecurityProfile() {
         </CardContent>
       </Card>
 
-      {isDialogChangePasswordOpen && (
+      {/* {isDialogChangePasswordOpen && (
         <DialogChangePassword
           open={isDialogChangePasswordOpen}
           setOpen={setIsDialogChangePasswordOpen}
         />
-      )}
+      )} */}
     </>
   );
 }

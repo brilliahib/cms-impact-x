@@ -1,4 +1,6 @@
 export interface ProfileUser {
+  id: number;
+  user_id: number;
   about_description: string;
   profile_images: string;
   role: string;

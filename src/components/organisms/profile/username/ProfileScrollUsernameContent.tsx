@@ -5,35 +5,30 @@ import { useState } from "react";
 import CardContactInfo from "@/components/molecules/card/CardContactInfo";
 import CardCurrentActivity from "@/components/molecules/card/CardCurrentActivity";
 import CardListPost from "@/components/molecules/card/CardListFeed";
-import { Button } from "@/components/ui/button";
 import { ProfileUser } from "@/types/profile/profile-user";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetAllFeedUser } from "@/http/feeds/get-all-feeds-user";
 import { useSession } from "next-auth/react";
-import { Plus } from "lucide-react";
 import { useGetAllActivityUser } from "@/http/activity/get-all-activity-user";
 import CardListActivity from "@/components/molecules/card/CardListActivity";
-import DialogCreateFeed from "@/components/molecules/dialog/feeds/DialogCreateFeed";
 
-interface ProfileScrollContentProps {
+interface ProfileScrollUsernameContentProps {
   profile?: ProfileUser;
   isPending?: boolean;
+  username?: string;
 }
 
-export default function ProfileScrollContent({
+export default function ProfileScrollUsernameContent({
+  username,
   profile,
   isPending,
-}: ProfileScrollContentProps) {
+}: ProfileScrollUsernameContentProps) {
   const [activeTab, setActiveTab] = useState<string>("feeds");
-  const [isDialogCreateFeedOpen, setIsDialogCreateFeedOpen] =
-    useState<boolean>(false);
-  const [isDialogCreateActivityOpen, setIsDialogCreateActivityOpen] =
-    useState<boolean>(false);
 
   const { data: session, status } = useSession();
 
   const { data: feed, isPending: feedIsPending } = useGetAllFeedUser(
-    session?.user.username as string,
+    username as string,
     session?.access_token as string,
     {
       enabled: status === "authenticated" && activeTab === "feeds",
@@ -41,17 +36,9 @@ export default function ProfileScrollContent({
   );
 
   const { data: activity, isPending: activityIsPending } =
-    useGetAllActivityUser(
-      session?.user.username as string,
-      session?.access_token as string,
-      {
-        enabled: status === "authenticated" && activeTab === "activity",
-      },
-    );
-
-  const handleDialogCreateFeedOpen = () => {
-    setIsDialogCreateFeedOpen(true);
-  };
+    useGetAllActivityUser(username as string, session?.access_token as string, {
+      enabled: status === "authenticated" && activeTab === "activity",
+    });
 
   return (
     <>
@@ -59,7 +46,7 @@ export default function ProfileScrollContent({
         {/* left content */}
         <div className="hidden space-y-4 md:block md:w-1/4 lg:w-1/3">
           <CardContactInfo data={profile} isPending={isPending} />
-          <CardCurrentActivity username={session?.user.username as string} />
+          <CardCurrentActivity username={username} />
         </div>
 
         {/* right content */}
@@ -70,16 +57,6 @@ export default function ProfileScrollContent({
                 <TabsTrigger value="feeds">Feeds</TabsTrigger>
                 <TabsTrigger value="activity">Activity</TabsTrigger>
               </TabsList>
-              {activeTab === "feeds" && (
-                <Button variant="outline" onClick={handleDialogCreateFeedOpen}>
-                  Create Feed <Plus />
-                </Button>
-              )}
-              {activeTab === "activity" && (
-                <Button variant="outline">
-                  Create Activity <Plus />
-                </Button>
-              )}
             </div>
             <TabsContent value="feeds" className="w-full">
               <CardListPost data={feed?.data} isPending={feedIsPending} />
@@ -93,11 +70,6 @@ export default function ProfileScrollContent({
           </Tabs>
         </div>
       </div>
-
-      <DialogCreateFeed
-        open={isDialogCreateFeedOpen}
-        setOpen={setIsDialogCreateFeedOpen}
-      />
     </>
   );
 }
