@@ -3,12 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useFollowUser } from "@/http/follow/follow-user";
+import { useGetIsFollowingUser } from "@/http/follow/get-is-following-user";
+import { useUnfollowUser } from "@/http/follow/unfollow-user";
 import { useGetProfileByUsername } from "@/http/profile/get-profile-by-username";
 import { buildFromAppURL } from "@/utils/misc";
+import { useQueryClient } from "@tanstack/react-query";
 import { Download, Plus, Settings } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface CardProfileByUsernameProps {
   username: string;
@@ -23,6 +28,42 @@ const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
       enabled: status === "authenticated",
     },
   );
+
+  const { data: isFollowing, isPending: isPendingFollowing } =
+    useGetIsFollowingUser(username, session?.access_token as string, {
+      enabled:
+        status === "authenticated" && session?.user.username !== username,
+    });
+
+  const queryClient = useQueryClient();
+
+  const followMutation = useFollowUser({
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["is-following-user", username],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["profile-user-by-username", username],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to follow this user!");
+    },
+  });
+
+  const unFollowMutation = useUnfollowUser({
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["is-following-user", username],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["profile-user-by-username", username],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to unfollow this user!");
+    },
+  });
 
   if (status === "loading" || isPending) {
     return (
@@ -131,10 +172,26 @@ const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
             </>
           ) : (
             <>
-              <Button className="w-full md:w-auto">
-                <Plus />
-                Follow
-              </Button>
+              {!isFollowing?.data.is_following && (
+                <Button
+                  className="w-full md:w-auto"
+                  variant="default"
+                  onClick={() => followMutation.mutate(username)}
+                >
+                  <Plus />
+                  Follow
+                </Button>
+              )}
+
+              {isFollowing?.data?.is_following && (
+                <Button
+                  className="w-full md:w-auto"
+                  variant="outline"
+                  onClick={() => unFollowMutation.mutate(username)}
+                >
+                  Unfollow
+                </Button>
+              )}
               <Button variant={"outline"}>
                 <Download />
                 Download Portofolio

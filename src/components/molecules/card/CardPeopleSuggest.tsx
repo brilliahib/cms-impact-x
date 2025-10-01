@@ -1,9 +1,35 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useFollowUser } from "@/http/follow/follow-user";
+import { User } from "@/types/user/user";
+import { buildFromAppURL } from "@/utils/misc";
+import { useQueryClient } from "@tanstack/react-query";
+import { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
 
-export default function CardPeopleSuggest() {
+interface CardPeopleSuggestProps {
+  data?: User[];
+  isPending?: boolean;
+}
+
+export default function CardPeopleSuggest({
+  data,
+  isPending,
+}: CardPeopleSuggestProps) {
+  const queryClient = useQueryClient();
+
+  const followMutation = useFollowUser({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["suggest-people"] });
+    },
+    onError: () => {
+      toast.error("Failed to follow this user!");
+    },
+  });
+
   return (
     <Card>
       <CardHeader className="flex items-center justify-between">
@@ -17,57 +43,62 @@ export default function CardPeopleSuggest() {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <Image
-              src={"/images/profile/profile-2d.png"}
-              alt="Profile Dummy"
-              width={50}
-              height={50}
-            />
-            <div className="flex flex-col gap-1">
-              <h1 className="text-sm font-medium">Bagus Tri Atmojo</h1>
-              <span className="text-muted-foreground text-sm">
-                UI/UX Designer
-              </span>
-            </div>
-            <Button variant={"outline"} size={"sm"}>
-              Follow
-            </Button>
-          </div>
-          <div className="flex items-center gap-3">
-            <Image
-              src={"/images/profile/profile-2d.png"}
-              alt="Profile Dummy"
-              width={50}
-              height={50}
-            />
-            <div className="flex flex-col gap-1">
-              <h1 className="text-sm font-medium">Bagus Tri Atmojo</h1>
-              <span className="text-muted-foreground text-sm">
-                UI/UX Designer
-              </span>
-            </div>
-            <Button variant={"outline"} size={"sm"}>
-              Follow
-            </Button>
-          </div>
-          <div className="flex items-center gap-3">
-            <Image
-              src={"/images/profile/profile-2d.png"}
-              alt="Profile Dummy"
-              width={50}
-              height={50}
-            />
-            <div className="flex flex-col gap-1">
-              <h1 className="text-sm font-medium">Bagus Tri Atmojo</h1>
-              <span className="text-muted-foreground text-sm">
-                UI/UX Designer
-              </span>
-            </div>
-            <Button variant={"outline"} size={"sm"}>
-              Follow
-            </Button>
-          </div>
+          {isPending ? (
+            [...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <Skeleton className="h-12 w-12 rounded-full border" />
+                <div className="flex flex-1 flex-col gap-1">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="h-8 w-20 rounded" />
+              </div>
+            ))
+          ) : data && data.length > 0 ? (
+            data.map((user) => (
+              <div key={user.id} className="flex items-center gap-3">
+                <div className="flex flex-1 items-center gap-3">
+                  <Image
+                    src={
+                      user?.profile?.profile_images
+                        ? buildFromAppURL(user.profile.profile_images)
+                        : "/images/profile/profile-2d.png"
+                    }
+                    alt={user?.name ?? `${user.first_name} ${user.last_name}`}
+                    width={50}
+                    height={50}
+                    className="rounded-full border"
+                  />
+                  <div className="flex flex-col gap-1">
+                    <Link
+                      href={`/profile/${user.username}`}
+                      className="hover:underline"
+                    >
+                      <h1 className="line-clamp-1 text-sm font-medium">
+                        {user.first_name} {user.last_name}
+                      </h1>
+                    </Link>
+                    {user.profile && user.profile.university && (
+                      <span className="text-muted-foreground line-clamp-1 text-sm">
+                        {user.profile.university}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  variant={"outline"}
+                  size={"sm"}
+                  onClick={() => followMutation.mutate(user.username)}
+                >
+                  Follow
+                </Button>
+              </div>
+            ))
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              No suggestions available.
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>
