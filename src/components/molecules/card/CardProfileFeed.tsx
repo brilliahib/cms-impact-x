@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useGetProfileSummary } from "@/http/profile/get-use-profile-user";
 import { buildFromAppURL } from "@/utils/misc";
+import { useGetCountFollowUser } from "@/http/follow/get-count-follow-user";
 
 export default function CardProfileFeed() {
   const { data: session, status } = useSession();
@@ -18,8 +19,15 @@ export default function CardProfileFeed() {
     },
   );
 
-  // Kondisi loading
-  if (status === "loading") {
+  const { data: count, isPending: isCountPending } = useGetCountFollowUser(
+    session?.user.username as string,
+    session?.access_token as string,
+    {
+      enabled: status === "authenticated",
+    },
+  );
+
+  if (status === "loading" || isPending) {
     return (
       <Card className="w-full overflow-hidden pt-0">
         <div className="relative h-32 w-full md:h-36">
@@ -39,7 +47,6 @@ export default function CardProfileFeed() {
     );
   }
 
-  // Layout utama dipakai ulang (session / no session)
   return (
     <Card className="w-full overflow-hidden pt-0">
       {/* background */}
@@ -98,7 +105,9 @@ export default function CardProfileFeed() {
                 ""
               )}
             </span>
-            <p className="text-sm text-[#0284C7]">40+ Followers</p>
+            <p className="text-sm text-[#0284C7]">
+              {count?.data.followers_count} Followers
+            </p>
           </div>
         ) : (
           <div className="flex flex-col gap-6">
