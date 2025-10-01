@@ -13,9 +13,14 @@ import { id } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Ellipsis } from "lucide-react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useGetAllActivity } from "@/http/activity/get-all-activity";
+import { Activity } from "@/types/activity/activity";
+
+interface CardListActivityProps {
+  data?: Activity[];
+  isPending?: boolean;
+  onSelect?: (activity: Activity) => void;
+}
 
 function ActivitySkeleton() {
   return (
@@ -49,35 +54,46 @@ function ActivitySkeleton() {
   );
 }
 
-export default function CardListActivity() {
-  const { data: session } = useSession();
-  const token = session?.access_token as string;
-
-  const { data, isPending } = useGetAllActivity(token);
-
+export default function CardListActivity({
+  data,
+  isPending,
+  onSelect,
+}: CardListActivityProps) {
   return (
     <div className="w-full space-y-6">
       {isPending
         ? Array.from({ length: 3 }).map((_, i) => <ActivitySkeleton key={i} />)
-        : data?.data
-            ?.slice()
-            .sort((a, b) => a.id - b.id)
-            .map((activity) => (
-              <Card key={activity.id} className="w-full">
-                <CardHeader className="flex items-start justify-between">
-                  <div className="space-y-4">
-                    <Link
-                      href={`/activity/${activity.id}`}
-                      className="mb-4 block hover:underline"
-                    >
-                      <CardTitle>{activity.title}</CardTitle>
-                    </Link>
-                    <div className="flex flex-row gap-2">
-                      <Badge className="capitalize">
-                        {activity.activity_type}
-                      </Badge>
-                      {Array.isArray(activity.activity_category)
-                        ? activity.activity_category.map((category, index) => (
+        : data?.map((activity) => (
+            <Card
+              key={activity.id}
+              className="w-full cursor-pointer hover:border-blue-500"
+              onClick={() => onSelect?.(activity)} // 🔥 kirim ke parent
+            >
+              <CardHeader className="flex items-start justify-between">
+                <div className="space-y-4">
+                  <Link
+                    href={`/activity/${activity.id}`}
+                    className="mb-4 block hover:underline"
+                    onClick={(e) => e.stopPropagation()} // biar klik link ga trigger onSelect
+                  >
+                    <CardTitle>{activity.title}</CardTitle>
+                  </Link>
+                  <div className="flex flex-row gap-2">
+                    <Badge className="capitalize">
+                      {activity.activity_type}
+                    </Badge>
+                    {Array.isArray(activity.activity_category)
+                      ? activity.activity_category.map((category, index) => (
+                          <Badge
+                            key={index}
+                            variant={"outline"}
+                            className="capitalize"
+                          >
+                            {category}
+                          </Badge>
+                        ))
+                      : JSON.parse(activity.activity_category).map(
+                          (category: string, index: number) => (
                             <Badge
                               key={index}
                               variant={"outline"}
@@ -85,40 +101,30 @@ export default function CardListActivity() {
                             >
                               {category}
                             </Badge>
-                          ))
-                        : JSON.parse(activity.activity_category).map(
-                            (category: string, index: number) => (
-                              <Badge
-                                key={index}
-                                variant={"outline"}
-                                className="capitalize"
-                              >
-                                {category}
-                              </Badge>
-                            ),
-                          )}
-                    </div>
+                          ),
+                        )}
                   </div>
-                  <div className="flex flex-row gap-4">
-                    <Badge className="bg-green-500/10 text-green-500">
-                      {activity.total_participants}/{activity.max_participants}
-                    </Badge>
-                    <Ellipsis />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm">
-                    Posted on:{" "}
-                    {format(new Date(activity.created_at), "d MMMM yyyy", {
-                      locale: id,
-                    })}
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button variant={"outline"}>See Details</Button>
-                </CardFooter>
-              </Card>
-            ))}
+                </div>
+                <div className="flex flex-row gap-4">
+                  <Badge className="bg-green-500/10 text-green-500">
+                    {activity.total_participants}/{activity.max_participants}
+                  </Badge>
+                  <Ellipsis />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  Posted on:{" "}
+                  {format(new Date(activity.created_at), "d MMMM yyyy", {
+                    locale: id,
+                  })}
+                </p>
+              </CardContent>
+              <CardFooter>
+                <Button variant={"outline"}>See Details</Button>
+              </CardFooter>
+            </Card>
+          ))}
     </div>
   );
 }
