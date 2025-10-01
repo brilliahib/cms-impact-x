@@ -22,7 +22,15 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { components } from "@/data/nav-items";
-import { Ellipsis, LogOut, Settings, Settings2, User } from "lucide-react";
+import {
+  Bell,
+  Ellipsis,
+  icons,
+  LogOut,
+  Settings,
+  Settings2,
+  User,
+} from "lucide-react";
 import { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { generateFallbackFromName } from "@/utils/generate-name";
@@ -114,60 +122,69 @@ export default function NavButton({ session, isPending }: NavButtonProps) {
             <Skeleton className="h-10 w-24 rounded-md" />
           </div>
         ) : session ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button size="icon" className="rounded-full border-0!">
-                <Avatar className="border-0">
-                  {data?.data.profile ? (
-                    <AvatarImage
-                      src={buildFromAppURL(data.data.profile.profile_images)}
-                      alt={session.user.first_name}
-                    />
-                  ) : (
-                    <AvatarFallback className="border-0 text-gray-700">
-                      {generateFallbackFromName(session.user.first_name)}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <Link href="/profile" className="flex items-center gap-2">
-                    <User /> Profile
-                  </Link>
+          <div className="flex items-center gap-8">
+            <div className="relative cursor-pointer p-0">
+              <Bell size={25} />
+              <span className="absolute top-3 -right-3 inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-1 text-xs leading-none font-bold text-white">
+                3
+              </span>
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button size="icon" className="rounded-full border-0!">
+                  <Avatar className="border-0">
+                    {data?.data.profile ? (
+                      <AvatarImage
+                        src={buildFromAppURL(data.data.profile.profile_images)}
+                        alt={session.user.first_name}
+                      />
+                    ) : (
+                      <AvatarFallback className="border-0 text-gray-700">
+                        {generateFallbackFromName(session.user.first_name)}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <span className="sr-only">Toggle user menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <Link href="/profile" className="flex items-center gap-2">
+                      <User /> Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link
+                      href="/profile/edit"
+                      className="flex items-center gap-2"
+                    >
+                      <Settings2 /> Account
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link
+                      href="/profile/security"
+                      className="flex items-center gap-2"
+                    >
+                      <Settings />
+                      Security & Privacy
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  className="text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer"
+                >
+                  <LogOut className="text-destructive" />
+                  Log out
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link
-                    href="/profile/edit"
-                    className="flex items-center gap-2"
-                  >
-                    <Settings2 /> Account
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link
-                    href="/profile/security"
-                    className="flex items-center gap-2"
-                  >
-                    <Settings />
-                    Security & Privacy
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => signOut({ callbackUrl: "/login" })}
-                className="text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer"
-              >
-                <LogOut className="text-destructive" />
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         ) : (
           <div className="flex items-center gap-4">
             <Link href="/login">
