@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { buildFromAppURL } from "@/utils/misc";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 interface CardListFeedProps {
   data?: Feed[];
@@ -105,9 +106,51 @@ export default function CardListFeed({ data, isPending }: CardListFeedProps) {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="border-b pb-4">
+                <div className="mb-4 border-b pb-4">
                   <h1 className="text-sm leading-6">{feed.content}</h1>
                 </div>
+                {feed.activity && (
+                  <Card className="pt-0">
+                    <CardHeader className="p-0">
+                      <Image
+                        src={buildFromAppURL(feed.activity.images)}
+                        width={100}
+                        height={100}
+                        alt={feed.activity.title}
+                        className="max-h-60 w-full rounded-t-xl object-cover"
+                      />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <h1 className="font-semibold">
+                            {feed.activity.title}
+                          </h1>
+                          <Badge className="rounded-full bg-green-100 px-2 text-green-700">
+                            {feed.activity.total_participants} /{" "}
+                            {feed.activity.max_participants}
+                          </Badge>
+                        </div>
+                        <p className="text-muted-foreground line-clamp-1">
+                          {feed.activity.description}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {feed.activity.activity_category.map(
+                            (category, index) => (
+                              <Badge
+                                variant={"secondary"}
+                                className="capitalize"
+                                key={index}
+                              >
+                                {category}
+                              </Badge>
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </CardContent>
               <CardFooter>
                 <div className="flex items-center gap-4">
