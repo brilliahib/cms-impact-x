@@ -13,7 +13,7 @@ export default function CardEditProfile() {
       <CardHeader>
         <CardTitle>Edit Profile</CardTitle>
         <CardDescription>
-          Informasi profilmu akan muncul saat berinteraksi dengan orang lain.
+          Your profile information will appear when interacting with others.
         </CardDescription>
       </CardHeader>
       <CardContent className="max-w-3xl">
