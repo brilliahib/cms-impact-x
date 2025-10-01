@@ -1,7 +1,6 @@
 import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { api } from "@/lib/axios";
-import { ProfileUser } from "@/types/profile/profile-user";
 
 interface GetIsFollowingUserResponse {
   data: {
