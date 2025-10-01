@@ -19,7 +19,7 @@ const CardProfile = () => {
     },
   );
 
-  if (status === "loading") {
+  if (status === "loading" || isPending) {
     return (
       <Card className="w-full overflow-hidden p-0">
         {/* Background */}
