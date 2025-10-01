@@ -11,7 +11,7 @@ import {
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default function CardFollowersContent() {
+export default function CardFollowingByUsernameContent() {
   return (
     <>
       <Tabs defaultValue="followers" className="mb-4">
@@ -47,10 +47,10 @@ export default function CardFollowersContent() {
             <CardContent className="grid grid-cols-3 gap-4">
               <AtomFollowings />
               <AtomFollowings />
-              <AtomFollowings />
-              <AtomFollowings />
-              <AtomFollowings />
-              <AtomFollowings />
+              <AtomFollowers />
+              <AtomFollowers />
+              <AtomFollowers />
+              <AtomFollowers />
             </CardContent>
             <CardFooter className="mx-auto">
               <Button variant={"ghost"}>Load More</Button>
