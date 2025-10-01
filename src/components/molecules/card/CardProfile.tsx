@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useGetCountFollowUser } from "@/http/follow/get-count-follow-user";
 import { useGetProfileUser } from "@/http/profile/get-profile-user";
 import { buildFromAppURL } from "@/utils/misc";
 import { Download, Settings } from "lucide-react";
@@ -13,6 +14,14 @@ import Link from "next/link";
 const CardProfile = () => {
   const { data: session, status } = useSession();
   const { data, isPending } = useGetProfileUser(
+    session?.access_token as string,
+    {
+      enabled: status === "authenticated",
+    },
+  );
+
+  const { data: count, isPending: countPending } = useGetCountFollowUser(
+    session?.user.username as string,
     session?.access_token as string,
     {
       enabled: status === "authenticated",
@@ -102,7 +111,9 @@ const CardProfile = () => {
           <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
             <p>{data?.data.role}</p>
             <span className="opacity-30">|</span>
-            <p className="text-sky-600">40+ Followers</p>
+            <p className="text-sky-600">
+              {count?.data.followers_count ?? 0} Followers
+            </p>
           </div>
         </div>
 

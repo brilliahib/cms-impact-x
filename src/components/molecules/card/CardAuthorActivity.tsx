@@ -199,7 +199,7 @@ export default function CardAuthorActivity({
                 <Image
                   src={buildFromAppURL(data.images)}
                   alt="Poster Activity"
-                  className="rounded-lg"
+                  className="max-h-[200px] rounded-lg object-cover md:max-h-[200px]"
                   width={300}
                   height={300}
                 />

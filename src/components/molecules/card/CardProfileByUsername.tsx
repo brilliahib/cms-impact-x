@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFollowUser } from "@/http/follow/follow-user";
+import { useGetCountFollowUser } from "@/http/follow/get-count-follow-user";
 import { useGetIsFollowingUser } from "@/http/follow/get-is-following-user";
 import { useUnfollowUser } from "@/http/follow/unfollow-user";
 import { useGetProfileByUsername } from "@/http/profile/get-profile-by-username";
@@ -29,11 +30,22 @@ const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
     },
   );
 
-  const { data: isFollowing, isPending: isPendingFollowing } =
-    useGetIsFollowingUser(username, session?.access_token as string, {
+  const { data: isFollowing } = useGetIsFollowingUser(
+    username,
+    session?.access_token as string,
+    {
       enabled:
         status === "authenticated" && session?.user.username !== username,
-    });
+    },
+  );
+
+  const { data: count, isPending: countPending } = useGetCountFollowUser(
+    username,
+    session?.access_token as string,
+    {
+      enabled: status === "authenticated",
+    },
+  );
 
   const queryClient = useQueryClient();
 
@@ -44,6 +56,9 @@ const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
       });
       queryClient.invalidateQueries({
         queryKey: ["profile-user-by-username", username],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["count-follow-user", username],
       });
     },
     onError: () => {
@@ -59,13 +74,16 @@ const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
       queryClient.invalidateQueries({
         queryKey: ["profile-user-by-username", username],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["count-follow-user", username],
+      });
     },
     onError: () => {
       toast.error("Failed to unfollow this user!");
     },
   });
 
-  if (status === "loading" || isPending) {
+  if (status === "loading" || isPending || countPending) {
     return (
       <Card className="w-full overflow-hidden p-0">
         {/* Background */}
@@ -149,7 +167,9 @@ const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
           <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
             <p>{data?.data && data.data.role ? data.data.role : "-"}</p>
             <span className="opacity-30">|</span>
-            <p className="text-sky-600">40+ Followers</p>
+            <p className="text-sky-600">
+              {count?.data.followers_count ?? 0} Followers
+            </p>
           </div>
         </div>
 

@@ -312,13 +312,15 @@ export default function FormEditProfile() {
                     </div>
                   ))}
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => appendContact("")}
-                  >
-                    <Plus />
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => appendContact("")}
+                    >
+                      <Plus />
+                    </Button>
+                  </div>
                 </div>
                 <FormMessage />
               </FormItem>
@@ -349,13 +351,15 @@ export default function FormEditProfile() {
                       </Button>
                     </div>
                   ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => appendSkill("")}
-                  >
-                    <Plus />
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => appendSkill("")}
+                    >
+                      <Plus />
+                    </Button>
+                  </div>
                 </div>
                 <FormMessage />
               </FormItem>
