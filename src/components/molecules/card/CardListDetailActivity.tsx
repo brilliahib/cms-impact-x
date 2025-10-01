@@ -1,4 +1,5 @@
 import AlertDialogApproveRegistration from "@/components/atoms/alert-dialog/activity/registration/AlertDialogApproveRegistration";
+import AlertDialogDeclineRegistration from "@/components/atoms/alert-dialog/activity/registration/AlertDialogDeclineRegistration";
 import SearchInput from "@/components/atoms/search/SearchInput";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,14 +32,22 @@ export default function CardListDetailActivity({
   );
 
   const [open, setOpen] = useState(false);
+  const [openDecline, setOpenDecline] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const queryClient = useQueryClient();
 
   const updateRegistration = useUpdateActivityRegistration(selectedId ?? 0, {
-    onSuccess: () => {
-      toast.success("Successfully approved this participant!");
+    onSuccess: (_, variables) => {
+      if (variables.status === "accepted") {
+        toast.success("Successfully approved this participant!");
+      } else if (variables.status === "rejected") {
+        toast.success("Successfully rejected this participant!");
+      }
+
       setOpen(false);
+      setOpenDecline(false);
+
       queryClient.invalidateQueries({
         queryKey: ["get-detail-activity", id],
       });
@@ -46,8 +55,12 @@ export default function CardListDetailActivity({
         queryKey: ["get-all-activity-registration", id],
       });
     },
-    onError: () => {
-      toast.error("Failed to approve this participant!");
+    onError: (_, variables) => {
+      if (variables?.status === "accepted") {
+        toast.error("Failed to approve this participant!");
+      } else if (variables?.status === "rejected") {
+        toast.error("Failed to reject this participant!");
+      }
     },
   });
 
@@ -56,10 +69,22 @@ export default function CardListDetailActivity({
     setOpen(true);
   };
 
+  const handleDecline = (registrationId: number) => {
+    setSelectedId(registrationId);
+    setOpenDecline(true);
+  };
+
   const confirmApprove = () => {
     if (!selectedId) return;
     updateRegistration.mutate({
       status: "accepted",
+    });
+  };
+
+  const confirmDecline = () => {
+    if (!selectedId) return;
+    updateRegistration.mutate({
+      status: "rejected",
     });
   };
 
@@ -117,11 +142,14 @@ export default function CardListDetailActivity({
                             <p className="font-medium">
                               {registration.user.name}
                             </p>
-                            <div className="text-muted-foreground flex flex-row gap-1">
-                              <p>{registration.user.profile.role}</p>
-                              <span className="opacity-30">|</span>
-                              <p>{registration.user.profile.university}</p>
-                            </div>
+                            {registration.user.profile.role &&
+                              registration.user.profile.university && (
+                                <div className="text-muted-foreground flex flex-row gap-1">
+                                  <p>{registration.user.profile.role}</p>
+                                  <span className="opacity-30">|</span>
+                                  <p>{registration.user.profile.university}</p>
+                                </div>
+                              )}
                           </div>
                         </div>
                         <div className="ml-14 flex flex-row gap-2">
@@ -137,6 +165,7 @@ export default function CardListDetailActivity({
                             variant={"outline"}
                             size={"sm"}
                             className="text-red-600 hover:bg-red-100 hover:text-red-600"
+                            onClick={() => handleDecline(registration.id)}
                           >
                             <X color="red" />
                             Decline
@@ -154,6 +183,13 @@ export default function CardListDetailActivity({
         open={open}
         setOpen={setOpen}
         confirmApprove={confirmApprove}
+        isPending={updateRegistration.isPending}
+      />
+
+      <AlertDialogDeclineRegistration
+        open={openDecline}
+        setOpen={setOpenDecline}
+        confirmDecline={confirmDecline}
         isPending={updateRegistration.isPending}
       />
     </>

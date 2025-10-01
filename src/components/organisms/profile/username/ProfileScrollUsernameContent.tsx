@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetAllFeedUser } from "@/http/feeds/get-all-feeds-user";
 import { useSession } from "next-auth/react";
 import { useGetAllActivityUser } from "@/http/activity/get-all-activity-user";
-import CardListActivity from "@/components/molecules/card/CardListActivity";
+import CardListActivityPeople from "@/components/molecules/card/CardListActivityPeople";
 
 interface ProfileScrollUsernameContentProps {
   profile?: ProfileUser;
@@ -62,7 +62,7 @@ export default function ProfileScrollUsernameContent({
               <CardListPost data={feed?.data} isPending={feedIsPending} />
             </TabsContent>
             <TabsContent value="activity">
-              <CardListActivity
+              <CardListActivityPeople
                 data={activity?.data}
                 isPending={activityIsPending}
               />
