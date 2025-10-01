@@ -220,10 +220,8 @@ export default function FormCreateActivity({
                         },
                         { value: "competition", label: "General Competition" },
                       ]}
-                      onValueChange={(values) =>
-                        form.setValue("activity_category", values)
-                      }
-                      defaultValue={field.value}
+                      value={field.value}
+                      onValueChange={(values) => field.onChange(values)}
                       placeholder="Select activity category"
                     />
                   </FormControl>

@@ -17,13 +17,16 @@ export const CreateActivityHandler = async (
 
   formData.append("title", body.title);
   formData.append("activity_type", body.activity_type);
-  formData.append("activity_category", JSON.stringify(body.activity_category));
   formData.append("location", body.location);
   formData.append("start_date", body.start_date);
   formData.append("end_date", body.end_date);
   formData.append("max_participants", body.max_participants.toString());
   formData.append("description", body.description);
   formData.append("requirements", body.requirements);
+
+  body.activity_category.forEach((cat, i) => {
+    formData.append(`activity_category[${i}]`, cat);
+  });
 
   if (body.benefits) {
     formData.append("benefits", body.benefits);

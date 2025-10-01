@@ -6,13 +6,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Ellipsis, MessageCircleMore, ThumbsUp } from "lucide-react";
-import Image from "next/image";
+import { Ellipsis } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { Activity } from "@/types/activity/activity";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface CardListActivityProps {
   data?: Activity[];
@@ -63,7 +63,12 @@ export default function CardListActivity({
             <Card key={activity.id} className="w-full">
               <CardHeader className="flex items-start justify-between">
                 <div className="space-y-4">
-                  <CardTitle>{activity.title}</CardTitle>
+                  <Link
+                    href={`/activity/${activity.id}`}
+                    className="mb-4 block hover:underline"
+                  >
+                    <CardTitle>{activity.title}</CardTitle>
+                  </Link>
                   <div className="flex flex-row gap-2">
                     <Badge className="capitalize">
                       {activity.activity_type}
