@@ -12,9 +12,9 @@ import { useGetAllFeedUser } from "@/http/feeds/get-all-feeds-user";
 import { useSession } from "next-auth/react";
 import { Plus } from "lucide-react";
 import { useGetAllActivityUser } from "@/http/activity/get-all-activity-user";
-import CardListActivity from "@/components/molecules/card/CardListActivity";
 import DialogCreateFeed from "@/components/molecules/dialog/feeds/DialogCreateFeed";
 import DialogCreateActivity from "@/components/molecules/dialog/activity/DialogCreateActivity";
+import CardListAuthorActivity from "@/components/molecules/card/CardListAuthorActivity";
 
 interface ProfileScrollContentProps {
   profile?: ProfileUser;
@@ -93,7 +93,7 @@ export default function ProfileScrollContent({
               <CardListPost data={feed?.data} isPending={feedIsPending} />
             </TabsContent>
             <TabsContent value="activity">
-              <CardListActivity
+              <CardListAuthorActivity
                 data={activity?.data}
                 isPending={activityIsPending}
               />
