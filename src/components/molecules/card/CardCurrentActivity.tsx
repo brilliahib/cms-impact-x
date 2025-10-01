@@ -38,7 +38,7 @@ export default function CardCurrentActivity({
         </Button>
       </CardHeader>
       <CardContent>
-        <div>
+        <div className="space-y-6">
           {isPending ? (
             <div className="space-y-4">
               {[1, 2].map((i) => (
