@@ -3,9 +3,10 @@
 import { useGetAllActivity } from "@/http/activity/get-all-activity";
 import { useSession } from "next-auth/react";
 import CardListActivity from "@/components/molecules/card/CardListActivity";
-import CardAuthorActivity from "@/components/molecules/card/CardAuthorActivity";
 import { useState } from "react";
 import { Activity } from "@/types/activity/activity";
+import CardActivityDetail from "@/components/molecules/card/CardActivityDetail";
+import { useGetDetailActivity } from "@/http/activity/get-detail-activity";
 
 export default function ActivityContent() {
   const { data: session, status } = useSession();
@@ -16,23 +17,30 @@ export default function ActivityContent() {
     },
   );
 
-  const [selectedActivity, setSelectedActivity] = useState<
-    Activity | undefined
-  >(undefined);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  const sortedData = data?.data?.slice().sort((a, b) => a.id - b.id) ?? [];
+  const defaultId = selectedId ?? data?.data[0]?.id ?? null;
+
+  const { data: detail, isPending: isDetailPending } = useGetDetailActivity(
+    defaultId!,
+    session?.access_token as string,
+    {
+      enabled: status === "authenticated" && defaultId !== null,
+    },
+  );
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <CardListActivity
-        data={sortedData}
+        data={data?.data}
         isPending={isPending}
-        onSelect={(activity) => setSelectedActivity(activity)}
+        onSelect={(id) => setSelectedId(id)}
       />
 
-      <CardAuthorActivity
-        data={selectedActivity ?? sortedData[0]}
-        isPending={isPending}
+      <CardActivityDetail
+        session={session!}
+        data={detail?.data}
+        isPending={isDetailPending}
       />
     </div>
   );

@@ -8,50 +8,50 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Ellipsis } from "lucide-react";
 import Link from "next/link";
 import { Activity } from "@/types/activity/activity";
 import SearchInput from "@/components/atoms/search/SearchInput";
+import Image from "next/image";
+import { buildFromAppURL } from "@/utils/misc";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { useState } from "react";
 
 interface CardListActivityProps {
   data?: Activity[];
   isPending?: boolean;
-  onSelect?: (activity: Activity) => void;
+  onSelect?: (activityId: number) => void;
 }
 
 function ActivitySkeleton() {
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <div className="flex justify-between">
-          <div className="flex items-center gap-3">
+    <Card className="mb-4 w-full">
+      <CardContent>
+        <div className="flex justify-between gap-4">
+          <div className="flex gap-4">
             <Skeleton className="h-12 w-12 rounded-full" />
             <div className="flex flex-col gap-2">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-3 w-48" />
-              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-5 w-40" />
+              <div className="flex gap-2">
+                <Skeleton className="h-5 w-20 rounded-full" />{" "}
+                <Skeleton className="h-5 w-16 rounded-full" />{" "}
+                <Skeleton className="h-5 w-16 rounded-full" />
+              </div>
             </div>
           </div>
-          <Skeleton className="h-5 w-5 rounded-md" />
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="border-b pb-4">
-          <Skeleton className="mb-2 h-4 w-full" />
-          <Skeleton className="h-4 w-5/6" />
+          <div className="flex items-center">
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </div>
         </div>
       </CardContent>
-      <CardFooter>
-        <div className="flex items-center gap-6">
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-20" />
-        </div>
-      </CardFooter>
     </Card>
   );
 }
@@ -61,76 +61,135 @@ export default function CardListActivity({
   isPending,
   onSelect,
 }: CardListActivityProps) {
+  const [selected, setSelected] = useState<string[]>([]);
   return (
-    <Card className="w-full space-y-6">
-      <CardContent className="space-y-4">
+    <Card className="h-fit w-full">
+      <CardContent className="space-y-6">
         <SearchInput placeholder="Search Activity..." fullWidth />
-        {isPending
-          ? Array.from({ length: 3 }).map((_, i) => (
-              <ActivitySkeleton key={i} />
-            ))
-          : data?.map((activity) => (
-              <Card
-                key={activity.id}
-                className="w-full cursor-pointer hover:border-blue-500"
-                onClick={() => onSelect?.(activity)}
-              >
-                <CardHeader className="flex items-start justify-between">
-                  <div className="space-y-4">
-                    <Link
-                      href={`/activity/${activity.id}`}
-                      className="mb-4 block hover:underline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <CardTitle>{activity.title}</CardTitle>
-                    </Link>
-                    <div className="flex flex-row gap-2">
-                      <Badge className="capitalize">
-                        {activity.activity_type}
-                      </Badge>
-                      {Array.isArray(activity.activity_category)
-                        ? activity.activity_category.map((category, index) => (
-                            <Badge
-                              key={index}
-                              variant={"outline"}
-                              className="capitalize"
-                            >
-                              {category}
-                            </Badge>
-                          ))
-                        : JSON.parse(activity.activity_category).map(
-                            (category: string, index: number) => (
-                              <Badge
-                                key={index}
-                                variant={"outline"}
-                                className="capitalize"
-                              >
-                                {category}
+        <div className="flex items-center gap-4">
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select activity" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="project">Project</SelectItem>
+              <SelectItem value="competition">Competition</SelectItem>
+              <SelectItem value="volunteer">Volunteer</SelectItem>
+            </SelectContent>
+          </Select>
+          <MultiSelect
+            options={[
+              { value: "science", label: "Science & Research" },
+              { value: "math", label: "Mathematics" },
+              {
+                value: "technology",
+                label: "Technology & Innovation",
+              },
+              { value: "engineering", label: "Engineering" },
+              {
+                value: "business",
+                label: "Business & Entrepreneurship",
+              },
+              { value: "economics", label: "Economics" },
+              { value: "law", label: "Law & Debate" },
+              { value: "medicine", label: "Medical & Health" },
+              { value: "social", label: "Social & Humanities" },
+              { value: "arts", label: "Arts & Design" },
+              { value: "music", label: "Music & Performance" },
+              { value: "literature", label: "Literature & Writing" },
+              { value: "sports", label: "Sports & E-Sports" },
+              {
+                value: "environment",
+                label: "Environment & Sustainability",
+              },
+              {
+                value: "volunteer",
+                label: "Volunteer / Community Service",
+              },
+              { value: "competition", label: "General Competition" },
+            ]}
+            placeholder="Select activity category"
+            className="flex-1"
+            value={selected}
+            onValueChange={(values) => setSelected(values)}
+          >
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="project">Project</SelectItem>
+            <SelectItem value="competition">Competition</SelectItem>
+            <SelectItem value="volunteer">Volunteer</SelectItem>
+          </MultiSelect>
+        </div>
+        <ScrollArea className="h-[60vh] w-full">
+          <div>
+            {isPending
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <ActivitySkeleton key={i} />
+                ))
+              : data?.map((activity) => (
+                  <Card
+                    key={activity.id}
+                    className="hover:bg-accent w-full cursor-pointer rounded-none! border-0 border-t border-b shadow-none"
+                    onClick={() => onSelect?.(activity.id)}
+                  >
+                    <CardContent>
+                      <div className="flex justify-between gap-4">
+                        <div className="flex gap-4">
+                          <Image
+                            src={
+                              activity?.user.profile_images
+                                ? buildFromAppURL(activity.user.profile_images)
+                                : "/images/profile/profile-2d.png"
+                            }
+                            alt={activity?.user.name ?? "Profile User"}
+                            width={50}
+                            height={50}
+                            className="h-fit rounded-full border"
+                          />
+                          <div className="space-y-4">
+                            <CardTitle>{activity.title}</CardTitle>
+                            <div className="flex flex-row gap-2">
+                              <Badge className="capitalize">
+                                {activity.activity_type}
                               </Badge>
-                            ),
-                          )}
-                    </div>
-                  </div>
-                  <div className="flex flex-row gap-4">
-                    <Badge className="bg-green-500/10 text-green-500">
-                      {activity.total_participants}/{activity.max_participants}
-                    </Badge>
-                    <Ellipsis />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm">
-                    Posted on:{" "}
-                    {format(new Date(activity.created_at), "d MMMM yyyy", {
-                      locale: id,
-                    })}
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button variant={"outline"}>See Details</Button>
-                </CardFooter>
-              </Card>
-            ))}
+                              {Array.isArray(activity.activity_category)
+                                ? activity.activity_category.map(
+                                    (category, index) => (
+                                      <Badge
+                                        key={index}
+                                        variant={"secondary"}
+                                        className="capitalize"
+                                      >
+                                        {category}
+                                      </Badge>
+                                    ),
+                                  )
+                                : JSON.parse(activity.activity_category).map(
+                                    (category: string, index: number) => (
+                                      <Badge
+                                        key={index}
+                                        variant={"secondary"}
+                                        className="capitalize"
+                                      >
+                                        {category}
+                                      </Badge>
+                                    ),
+                                  )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex h-fit flex-row gap-4">
+                          <Badge className="rounded-full bg-green-500/10 text-green-500">
+                            {activity.total_participants}/
+                            {activity.max_participants}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+          </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   );
