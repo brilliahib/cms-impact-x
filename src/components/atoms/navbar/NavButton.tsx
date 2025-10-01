@@ -118,9 +118,9 @@ export default function NavButton({ session, isPending }: NavButtonProps) {
             <DropdownMenuTrigger>
               <Button size="icon" className="rounded-full border-0!">
                 <Avatar className="border-0">
-                  <AvatarImage
+                  {/* <AvatarImage
                     src={buildFromAppURL(data?.data.profile.profile_images)}
-                  />
+                  /> */}
                   <AvatarFallback className="border-0 text-gray-700">
                     {generateFallbackFromName(session.user.first_name)}
                   </AvatarFallback>

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -6,18 +8,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Ellipsis, MessageCircleMore, ThumbsUp } from "lucide-react";
-import Image from "next/image";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { Activity } from "@/types/activity/activity";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-interface CardListActivityProps {
-  data?: Activity[];
-  isPending?: boolean;
-}
+import { Ellipsis } from "lucide-react";
+import { useGetAllActivity } from "@/http/activity/use-get-all-activity";
+import { useSession } from "next-auth/react";
 
 function ActivitySkeleton() {
   return (
@@ -51,15 +48,17 @@ function ActivitySkeleton() {
   );
 }
 
-export default function CardListActivity({
-  data,
-  isPending,
-}: CardListActivityProps) {
+export default function CardListActivity() {
+  const { data: session } = useSession();
+  const token = session?.access_token as string;
+
+  const { data, isPending } = useGetAllActivity(token);
+
   return (
     <div className="w-full space-y-6">
       {isPending
         ? Array.from({ length: 3 }).map((_, i) => <ActivitySkeleton key={i} />)
-        : data?.map((activity) => (
+        : data?.data.map((activity) => (
             <Card key={activity.id} className="w-full">
               <CardHeader className="flex items-start justify-between">
                 <div className="space-y-4">
@@ -68,27 +67,39 @@ export default function CardListActivity({
                     <Badge className="capitalize">
                       {activity.activity_type}
                     </Badge>
-                    {activity.activity_category.map((category, index) => (
-                      <Badge
-                        key={index}
-                        variant={"outline"}
-                        className="capitalize"
-                      >
-                        {category}
-                      </Badge>
-                    ))}
+                    {Array.isArray(activity.activity_category)
+                      ? activity.activity_category.map((category, index) => (
+                          <Badge
+                            key={index}
+                            variant={"outline"}
+                            className="capitalize"
+                          >
+                            {category}
+                          </Badge>
+                        ))
+                      : JSON.parse(activity.activity_category).map(
+                          (category: string, index: number) => (
+                            <Badge
+                              key={index}
+                              variant={"outline"}
+                              className="capitalize"
+                            >
+                              {category}
+                            </Badge>
+                          ),
+                        )}
                   </div>
                 </div>
                 <div className="flex flex-row gap-4">
                   <Badge className="bg-green-500/10 text-green-500">
-                    1/{activity.max_participants}
+                    {activity.total_participants}/{activity.max_participants}
                   </Badge>
                   <Ellipsis />
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  Posted on: {""}
+                  Posted on:{" "}
                   {format(new Date(activity.created_at), "d MMMM yyyy", {
                     locale: id,
                   })}
