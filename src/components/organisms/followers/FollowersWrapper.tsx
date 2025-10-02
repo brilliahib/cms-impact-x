@@ -1,15 +1,13 @@
 import CardFollowersContent from "../../molecules/card/CardFollowersContent";
-import FollowersRightContent from "./FollowersRightContent";
+import BreadcrumbContent from "@/components/atoms/breadcrumb/BreadcrumbItem";
 
 export default function FollowersWrapper() {
   return (
-    <section className="flex w-full flex-col gap-6 md:flex-row">
-      <div className="md:w-3/4">
-        <CardFollowersContent />
+    <>
+      <div className="mb-6 w-full">
+        <BreadcrumbContent />
       </div>
-      <div className="md:w-1/4">
-        <FollowersRightContent />
-      </div>
-    </section>
+      <CardFollowersContent />
+    </>
   );
 }

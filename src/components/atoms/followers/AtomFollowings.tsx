@@ -3,6 +3,12 @@ import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 export default function AtomFollowers() {
   return (
     <>
@@ -22,9 +28,19 @@ export default function AtomFollowers() {
             </p>
           </div>
         </CardContent>
-        <Button variant={"outline"} size={"sm"} className={"text-xs"}>
-          Follow
-        </Button>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant={"secondary"} size={"sm"} className={"text-xs"}>
+              Followed
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-fit p-0" align="start">
+            <Button variant={"ghost"} size={"sm"} className={"text-xs"}>
+              Stop Following
+            </Button>
+          </PopoverContent>
+        </Popover>
       </Card>
     </>
   );

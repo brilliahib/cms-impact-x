@@ -167,9 +167,11 @@ const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
           <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
             <p>{data?.data && data.data.role ? data.data.role : "-"}</p>
             <span className="opacity-30">|</span>
-            <p className="text-sky-600">
-              {count?.data.followers_count ?? 0} Followers
-            </p>
+            <Link href={`/profile/${username}/follows`}>
+              <p className="text-sky-600">
+                {count?.data.followers_count ?? 0} Followers
+              </p>
+            </Link>
           </div>
         </div>
 

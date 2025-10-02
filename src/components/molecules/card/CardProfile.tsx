@@ -111,9 +111,11 @@ const CardProfile = () => {
           <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
             <p>{data?.data.role}</p>
             <span className="opacity-30">|</span>
-            <p className="text-sky-600">
-              {count?.data.followers_count ?? 0} Followers
-            </p>
+            <Link href={`/followers`}>
+              <p className="text-sky-600">
+                {count?.data.followers_count ?? 0} Followers
+              </p>
+            </Link>
           </div>
         </div>
 
