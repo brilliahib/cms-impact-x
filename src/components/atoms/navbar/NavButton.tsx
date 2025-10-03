@@ -48,6 +48,9 @@ import { signOut } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetProfileSummary } from "@/http/profile/get-use-profile-user";
 import { buildFromAppURL } from "@/utils/misc";
+import { useGetCountUnreadNotification } from "@/http/notification/get-count-unread-notification";
+import { NotificationBar } from "../notif/NotificationBar";
+import { useGetAllNotification } from "@/http/notification/get-all-notification";
 
 function MobileLink({
   href,
@@ -112,6 +115,16 @@ export default function NavButton({ session, isPending }: NavButtonProps) {
     },
   );
 
+  const { data: count, isPending: isCountPending } =
+    useGetCountUnreadNotification(session?.access_token as string, {
+      enabled: !!session,
+    });
+
+  const { data: notifications, isPending: isNotificationsPending } =
+    useGetAllNotification(session?.access_token as string, {
+      enabled: !!session,
+    });
+
   return (
     <>
       {/* Desktop */}
@@ -123,12 +136,7 @@ export default function NavButton({ session, isPending }: NavButtonProps) {
           </div>
         ) : session ? (
           <div className="flex items-center gap-8">
-            <div className="relative cursor-pointer p-0">
-              <Bell size={25} />
-              <span className="absolute top-3 -right-3 inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-1 text-xs leading-none font-bold text-white">
-                3
-              </span>
-            </div>
+            <NotificationBar count={count?.data} data={notifications?.data} />
 
             <DropdownMenu>
               <DropdownMenuTrigger>
