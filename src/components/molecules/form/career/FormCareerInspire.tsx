@@ -28,8 +28,8 @@ import { careerOptionsInspire } from "@/constants/career-options-inspire";
 
 // Schema validasi pakai zod
 const FormSchema = z.object({
-  category: z.enum(
-    [
+  category: z
+    .enum([
       "technology",
       "health",
       "environment",
@@ -37,11 +37,10 @@ const FormSchema = z.object({
       "arts",
       "business",
       "science",
-    ],
-    {
-      required_error: "You need to select a category.",
-    },
-  ),
+    ])
+    .refine((val) => !!val, {
+      message: "You need to select a category.",
+    }),
 });
 
 export function FormCareerInspire({ onNext }: { onNext: () => void }) {

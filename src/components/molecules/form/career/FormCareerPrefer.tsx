@@ -27,18 +27,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { careerOptionsPrefer } from "@/constants/career-options-prefer";
 
 const FormSchema = z.object({
-  category: z.enum(
-    [
+  category: z
+    .enum([
       "Collaborative",
       "Independent",
       "environment",
       "Research-oriented",
       "Leadership",
-    ],
-    {
-      required_error: "You need to select a category.",
-    },
-  ),
+    ])
+    .refine((val) => !!val, {
+      message: "You need to select a category.",
+    }),
 });
 
 export function FormCareerPrefer({ onNext }: { onNext: () => void }) {
