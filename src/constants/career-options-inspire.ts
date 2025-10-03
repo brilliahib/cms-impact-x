@@ -1,4 +1,4 @@
-export const careerOptions = [
+export const careerOptionsInspire = [
   { value: "technology", label: "Technology" },
   { value: "health", label: "Health & Biotechnology" },
   { value: "environment", label: "Environment & Sustainability" },

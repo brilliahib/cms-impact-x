@@ -3,7 +3,6 @@
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -23,10 +22,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { careerOptions } from "@/constants/career-options";
 
+import { careerOptionsInspire } from "@/constants/career-options-inspire";
+
+// Schema validasi pakai zod
 const FormSchema = z.object({
   category: z.enum(
     [
@@ -44,19 +44,16 @@ const FormSchema = z.object({
   ),
 });
 
-export function FormCareer() {
+export function FormCareerInspire({ onNext }: { onNext: () => void }) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast("You submitted the following values", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    console.log("Inspire submitted:", data);
+
+    // Setelah submit valid, lanjut ke step berikutnya
+    onNext();
   }
 
   return (
@@ -84,7 +81,7 @@ export function FormCareer() {
                         defaultValue={field.value}
                         className="flex flex-col gap-3"
                       >
-                        {careerOptions.map((option) => (
+                        {careerOptionsInspire.map((option) => (
                           <FormItem
                             key={option.value}
                             className="flex items-center gap-1"
