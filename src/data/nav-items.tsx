@@ -3,19 +3,19 @@ import { FileText, HandHeart, Trophy } from "lucide-react";
 export const components = [
   {
     title: "Project",
-    href: "/projects",
+    href: "/activity/types/project",
     description: "Bangun portofolio dengan mengerjakan project",
     icon: FileText,
   },
   {
     title: "Competition",
-    href: "/competitions",
+    href: "/activity/types/competition",
     description: "Buktikan kemampuanmu bersama orang lain",
     icon: Trophy,
   },
   {
     title: "Volunteer",
-    href: "/volunteers",
+    href: "/activity/types/volunteer",
     description: "Bergabung dalam kegiatan sosial untuk dampak nyata",
     icon: HandHeart,
   },

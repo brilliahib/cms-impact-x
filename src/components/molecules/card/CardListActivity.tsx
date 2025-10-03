@@ -1,15 +1,8 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
 import { Activity } from "@/types/activity/activity";
 import SearchInput from "@/components/atoms/search/SearchInput";
 import Image from "next/image";
@@ -29,6 +22,9 @@ interface CardListActivityProps {
   data?: Activity[];
   isPending?: boolean;
   onSelect?: (activityId: number) => void;
+  showSelect?: boolean;
+  onTypeChange?: (type: string) => void;
+  selectedType?: string;
 }
 
 function ActivitySkeleton() {
@@ -60,6 +56,9 @@ export default function CardListActivity({
   data,
   isPending,
   onSelect,
+  showSelect = true,
+  onTypeChange,
+  selectedType,
 }: CardListActivityProps) {
   const [selected, setSelected] = useState<string[]>([]);
   return (
@@ -67,17 +66,24 @@ export default function CardListActivity({
       <CardContent className="space-y-6">
         <SearchInput placeholder="Search Activity..." fullWidth />
         <div className="flex items-center gap-4">
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select activity" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="project">Project</SelectItem>
-              <SelectItem value="competition">Competition</SelectItem>
-              <SelectItem value="volunteer">Volunteer</SelectItem>
-            </SelectContent>
-          </Select>
+          {showSelect && (
+            <Select
+              value={selectedType || "all"}
+              onValueChange={(value) =>
+                onTypeChange?.(value === "all" ? "" : value)
+              }
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select activity" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="project">Project</SelectItem>
+                <SelectItem value="competition">Competition</SelectItem>
+                <SelectItem value="volunteer">Volunteer</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           <MultiSelect
             options={[
               { value: "science", label: "Science & Research" },
@@ -122,72 +128,78 @@ export default function CardListActivity({
         </div>
         <ScrollArea className="h-[60vh] w-full">
           <div>
-            {isPending
-              ? Array.from({ length: 3 }).map((_, i) => (
-                  <ActivitySkeleton key={i} />
-                ))
-              : data?.map((activity) => (
-                  <Card
-                    key={activity.id}
-                    className="hover:bg-accent w-full cursor-pointer rounded-none! border-0 border-t border-b shadow-none"
-                    onClick={() => onSelect?.(activity.id)}
-                  >
-                    <CardContent>
-                      <div className="flex justify-between gap-4">
-                        <div className="flex gap-4">
-                          <Image
-                            src={
-                              activity?.user.profile_images
-                                ? buildFromAppURL(activity.user.profile_images)
-                                : "/images/profile/profile-2d.png"
-                            }
-                            alt={activity?.user.name ?? "Profile User"}
-                            width={50}
-                            height={50}
-                            className="h-fit rounded-full border"
-                          />
-                          <div className="space-y-4">
-                            <CardTitle>{activity.title}</CardTitle>
-                            <div className="flex flex-row gap-2">
-                              <Badge className="capitalize">
-                                {activity.activity_type}
-                              </Badge>
-                              {Array.isArray(activity.activity_category)
-                                ? activity.activity_category.map(
-                                    (category, index) => (
-                                      <Badge
-                                        key={index}
-                                        variant={"secondary"}
-                                        className="capitalize"
-                                      >
-                                        {category}
-                                      </Badge>
-                                    ),
-                                  )
-                                : JSON.parse(activity.activity_category).map(
-                                    (category: string, index: number) => (
-                                      <Badge
-                                        key={index}
-                                        variant={"secondary"}
-                                        className="capitalize"
-                                      >
-                                        {category}
-                                      </Badge>
-                                    ),
-                                  )}
-                            </div>
+            {isPending ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <ActivitySkeleton key={i} />
+              ))
+            ) : data && data.length > 0 ? (
+              data.map((activity) => (
+                <Card
+                  key={activity.id}
+                  className="hover:bg-accent w-full cursor-pointer rounded-none! border-0 border-t border-b shadow-none"
+                  onClick={() => onSelect?.(activity.id)}
+                >
+                  <CardContent>
+                    <div className="flex justify-between gap-4">
+                      <div className="flex gap-4">
+                        <Image
+                          src={
+                            activity?.user.profile_images
+                              ? buildFromAppURL(activity.user.profile_images)
+                              : "/images/profile/profile-2d.png"
+                          }
+                          alt={activity?.user.name ?? "Profile User"}
+                          width={50}
+                          height={50}
+                          className="h-fit rounded-full border"
+                        />
+                        <div className="space-y-4">
+                          <CardTitle>{activity.title}</CardTitle>
+                          <div className="flex flex-row gap-2">
+                            <Badge className="capitalize">
+                              {activity.activity_type}
+                            </Badge>
+                            {Array.isArray(activity.activity_category)
+                              ? activity.activity_category.map(
+                                  (category, index) => (
+                                    <Badge
+                                      key={index}
+                                      variant={"secondary"}
+                                      className="capitalize"
+                                    >
+                                      {category}
+                                    </Badge>
+                                  ),
+                                )
+                              : JSON.parse(activity.activity_category).map(
+                                  (category: string, index: number) => (
+                                    <Badge
+                                      key={index}
+                                      variant={"secondary"}
+                                      className="capitalize"
+                                    >
+                                      {category}
+                                    </Badge>
+                                  ),
+                                )}
                           </div>
                         </div>
-                        <div className="flex h-fit flex-row gap-4">
-                          <Badge className="rounded-full bg-green-500/10 text-green-500">
-                            {activity.total_participants}/
-                            {activity.max_participants}
-                          </Badge>
-                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      <div className="flex h-fit flex-row gap-4">
+                        <Badge className="rounded-full bg-green-500/10 text-green-500">
+                          {activity.total_participants}/
+                          {activity.max_participants}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="flex items-center justify-center py-10 text-gray-500">
+                No activities available.
+              </div>
+            )}
           </div>
         </ScrollArea>
       </CardContent>
