@@ -27,21 +27,28 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { careerOptionsChallenge } from "@/constants/career-options-challange";
 
 const FormSchema = z.object({
-  category: z
-    .enum(["Problem Solving", "Innovation", "Data-driven", "Communication"])
-    .refine((val) => !!val, {
-      message: "You need to select a category.",
-    }),
+  category: z.enum([
+    "Problem Solving",
+    "Innovation",
+    "Data-driven",
+    "Communication",
+  ]),
 });
 
-export function FormCareerChallenge({ onNext }: { onNext: () => void }) {
-  const form = useForm<z.infer<typeof FormSchema>>({
+type FormSchemaType = z.infer<typeof FormSchema>;
+
+export function FormCareerChallenge({
+  onNext,
+}: {
+  onNext: (data: FormSchemaType) => void;
+}) {
+  const form = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(data: FormSchemaType) {
     console.log("Challenge submitted:", data);
-    onNext();
+    onNext(data);
   }
 
   return (

@@ -15,7 +15,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
 import {
   Card,
   CardContent,
@@ -31,17 +30,24 @@ const FormSchema = z.object({
   }),
 });
 
-export function FormCareerSoftSkill({ onNext }: { onNext: () => void }) {
-  const form = useForm<z.infer<typeof FormSchema>>({
+type SoftSkillFormData = z.infer<typeof FormSchema>;
+
+interface FormCareerSoftSkillProps {
+  onNext: (data: SoftSkillFormData) => void;
+}
+
+export function FormCareerSoftSkill({ onNext }: FormCareerSoftSkillProps) {
+  // Gunakan tipe yang sudah dibuat untuk useForm
+  const form = useForm<SoftSkillFormData>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       categories: [],
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(data: SoftSkillFormData) {
     console.log("Soft skills submitted:", data);
-    onNext();
+    onNext(data);
   }
 
   return (
@@ -60,7 +66,6 @@ export function FormCareerSoftSkill({ onNext }: { onNext: () => void }) {
               name="categories"
               render={() => (
                 <FormItem>
-                  {/* <FormLabel>Select your career categories</FormLabel> */}
                   <div className="mt-2 space-y-3">
                     {CareerOptionsSoftSkill.map((option) => (
                       <FormField

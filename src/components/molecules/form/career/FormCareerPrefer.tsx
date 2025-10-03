@@ -24,30 +24,35 @@ import {
 } from "@/components/ui/card";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { careerOptionsPrefer } from "@/constants/career-options-prefer";
+import {
+  careerOptionsPrefer,
+  CareerPreferCategory,
+} from "@/constants/career-options-prefer";
 
 const FormSchema = z.object({
-  category: z
-    .enum([
-      "Collaborative",
-      "Independent",
-      "environment",
-      "Research-oriented",
-      "Leadership",
-    ])
-    .refine((val) => !!val, {
-      message: "You need to select a category.",
-    }),
+  category: z.enum([
+    "Collaborative",
+    "Independent",
+    "environment",
+    "Research-oriented",
+    "Leadership",
+  ] as [CareerPreferCategory, ...CareerPreferCategory[]]),
 });
 
-export function FormCareerPrefer({ onNext }: { onNext: () => void }) {
-  const form = useForm<z.infer<typeof FormSchema>>({
+type FormSchemaType = z.infer<typeof FormSchema>;
+
+interface FormCareerPreferProps {
+  onNext: (data: FormSchemaType) => void;
+}
+
+export function FormCareerPrefer({ onNext }: FormCareerPreferProps) {
+  const form = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(data: FormSchemaType) {
     console.log("Prefer submitted:", data);
-    onNext();
+    onNext(data);
   }
 
   return (
@@ -67,7 +72,6 @@ export function FormCareerPrefer({ onNext }: { onNext: () => void }) {
               name="category"
               render={({ field }) => (
                 <FormItem className="space-y-1">
-                  {/* <FormLabel>Select your career category</FormLabel> */}
                   <FormControl>
                     <ScrollArea className="h-72">
                       <RadioGroup

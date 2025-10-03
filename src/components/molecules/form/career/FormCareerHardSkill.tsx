@@ -15,7 +15,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
 import {
   Card,
   CardContent,
@@ -24,25 +23,41 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { careerOptionsChallenge } from "@/constants/career-options-challange";
+import {
+  HardSkill,
+  HardSkillCategory,
+} from "@/constants/career-options-hardskill";
 
 const FormSchema = z.object({
-  categories: z.array(z.string()).refine((value) => value.length > 0, {
-    message: "You must select at least one category.",
+  categories: z.array(z.string()).min(1, {
+    message: "You must select at least one skill.",
   }),
 });
 
-export function FormCareerHardSkill({ onNext }: { onNext: () => void }) {
-  const form = useForm<z.infer<typeof FormSchema>>({
+type FormSchemaType = z.infer<typeof FormSchema>;
+
+interface FormCareerHardSkillProps {
+  category: HardSkillCategory;
+  onNext: (data: { category: HardSkillCategory; skills: string[] }) => void;
+}
+
+export function FormCareerHardSkill({
+  category,
+  onNext,
+}: FormCareerHardSkillProps) {
+  const form = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      categories: [],
-    },
+    defaultValues: { categories: [] },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log("Hard skills submitted:", data);
-    onNext();
+  const options = HardSkill[category] || [];
+
+  function onSubmit(data: FormSchemaType) {
+    console.log("Hard skills submitted:", {
+      category,
+      skills: data.categories,
+    });
+    onNext({ category, skills: data.categories });
   }
 
   return (
@@ -50,7 +65,7 @@ export function FormCareerHardSkill({ onNext }: { onNext: () => void }) {
       <CardHeader>
         <CardTitle>Your Hard Skills</CardTitle>
         <CardDescription>
-          Highlight the skills you enjoy using the most.
+          Pick the skills you enjoy using the most.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -61,9 +76,8 @@ export function FormCareerHardSkill({ onNext }: { onNext: () => void }) {
               name="categories"
               render={() => (
                 <FormItem>
-                  {/* <FormLabel>Select your career categories</FormLabel> */}
                   <div className="mt-2 space-y-3">
-                    {careerOptionsChallenge.map((option) => (
+                    {options.map((option) => (
                       <FormField
                         key={option.value}
                         control={form.control}
@@ -90,14 +104,9 @@ export function FormCareerHardSkill({ onNext }: { onNext: () => void }) {
                                 }}
                               />
                             </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel className="font-normal">
-                                {option.label}
-                              </FormLabel>
-                              <p className="text-muted-foreground text-xs">
-                                {option.desc}
-                              </p>
-                            </div>
+                            <FormLabel className="font-normal">
+                              {option.label}
+                            </FormLabel>
                           </FormItem>
                         )}
                       />
@@ -107,7 +116,6 @@ export function FormCareerHardSkill({ onNext }: { onNext: () => void }) {
                 </FormItem>
               )}
             />
-
             <Button className="w-full" type="submit">
               Next
             </Button>

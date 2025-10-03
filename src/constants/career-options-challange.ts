@@ -1,3 +1,15 @@
+export type CareerChallengeCategory =
+  | "Problem Solving"
+  | "Innovation"
+  | "Data-driven"
+  | "Communication";
+
+export interface CareerOption {
+  value: CareerChallengeCategory;
+  label: string;
+  desc: string;
+}
+
 export const careerOptionsChallenge = [
   {
     value: "Problem Solving",

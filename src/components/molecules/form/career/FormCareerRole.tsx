@@ -30,27 +30,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { CareerOptionsSoftSkill } from "@/constants/career-options-softskill";
+import { CareerOptionsRole } from "@/constants/career-options-role";
 import { Input } from "@/components/ui/input";
 
-// pakai refine biar string kosong ga bisa
 const FormSchema = z.object({
-  category: z.string().refine((val) => val !== "", {
-    message: "You must select a category.",
-  }),
+  category: z.enum(["Role 1", "Role 2", "Role 3", "Role 4", "Other"]),
+  role: z.string().optional(),
 });
 
-export function FormCareerRole({ onNext }: { onNext: () => void }) {
-  const form = useForm<z.infer<typeof FormSchema>>({
+type FormSchemaType = z.infer<typeof FormSchema>;
+
+interface FormCareerRoleProps {
+  onNext: (data: { role: string }) => void;
+}
+
+export function FormCareerRole({ onNext }: FormCareerRoleProps) {
+  const form = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      category: "",
+      category: "Role 1", // atau "" kalau mau mulai kosong
+      role: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log("Role submitted:", data);
-    onNext();
+  const category = form.watch("category");
+
+  function onSubmit(data: FormSchemaType) {
+    const finalData = {
+      role: data.category === "Other" ? data.role || "" : data.category,
+    };
+    console.log("Role submitted:", finalData);
+    onNext(finalData);
   }
 
   return (
@@ -64,6 +74,7 @@ export function FormCareerRole({ onNext }: { onNext: () => void }) {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Category Select */}
             <FormField
               control={form.control}
               name="category"
@@ -78,25 +89,38 @@ export function FormCareerRole({ onNext }: { onNext: () => void }) {
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {CareerOptionsSoftSkill.map((option) => (
+                        {CareerOptionsRole.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
                         ))}
+                        <SelectItem value="Other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
-
-                  <div className="my-2 border-t" />
-                  <Input placeholder="Enter your role" />
-                  <p className="text-muted-foreground mb-2 text-sm">
-                    Ex: Designer, Freelancer, Writer, Programmer
-                  </p>
-
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/* Kalau pilih Other, baru keluar input */}
+            {category === "Other" && (
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="Enter your role" {...field} />
+                    </FormControl>
+                    <p className="text-muted-foreground mb-2 text-sm">
+                      Ex: Designer, Freelancer, Writer, Programmer
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <Button className="w-full" type="submit">
               Next

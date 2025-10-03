@@ -11,7 +11,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -26,33 +25,30 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { careerOptionsInspire } from "@/constants/career-options-inspire";
 
-// Schema validasi pakai zod
 const FormSchema = z.object({
-  category: z
-    .enum([
-      "technology",
-      "health",
-      "environment",
-      "social",
-      "arts",
-      "business",
-      "science",
-    ])
-    .refine((val) => !!val, {
-      message: "You need to select a category.",
-    }),
+  category: z.enum([
+    "technology",
+    "health",
+    "environment",
+    "social",
+    "arts",
+    "business",
+    "science",
+  ]),
 });
 
-export function FormCareerInspire({ onNext }: { onNext: () => void }) {
+export function FormCareerInspire({
+  onNext,
+}: {
+  onNext: (category: string) => void;
+}) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log("Inspire submitted:", data);
-
-    // Setelah submit valid, lanjut ke step berikutnya
-    onNext();
+    onNext(data.category);
   }
 
   return (
@@ -72,7 +68,6 @@ export function FormCareerInspire({ onNext }: { onNext: () => void }) {
               name="category"
               render={({ field }) => (
                 <FormItem className="space-y-1">
-                  {/* <FormLabel>Select your career category</FormLabel> */}
                   <FormControl>
                     <ScrollArea className="h-72">
                       <RadioGroup
@@ -89,9 +84,7 @@ export function FormCareerInspire({ onNext }: { onNext: () => void }) {
                               <FormControl>
                                 <RadioGroupItem value={option.value} />
                               </FormControl>
-                              <FormLabel className="font-normal">
-                                {option.label}
-                              </FormLabel>
+                              <span>{option.label}</span>
                             </Card>
                           </FormItem>
                         ))}
