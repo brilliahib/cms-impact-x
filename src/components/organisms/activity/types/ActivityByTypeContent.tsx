@@ -7,13 +7,17 @@ import CardActivityDetail from "@/components/molecules/card/CardActivityDetail";
 import { useGetDetailActivity } from "@/http/activity/get-detail-activity";
 import { useGetAllActivityByType } from "@/http/activity/get-activity-by-type";
 
-export default function ActivityContent() {
-  const [activityType, setActivityType] = useState<string>("");
+interface ActivityByTypeContentProps {
+  name: string;
+}
 
+export default function ActivityByTypeContent({
+  name,
+}: ActivityByTypeContentProps) {
   const { data: session, status } = useSession();
   const { data, isPending } = useGetAllActivityByType(
     session?.access_token as string,
-    activityType,
+    name,
     {
       enabled: status === "authenticated",
     },
@@ -37,8 +41,7 @@ export default function ActivityContent() {
         data={data?.data}
         isPending={isPending}
         onSelect={(id) => setSelectedId(id)}
-        onTypeChange={setActivityType}
-        selectedType={activityType === "" ? "all" : activityType}
+        showSelect={false}
       />
 
       <CardActivityDetail

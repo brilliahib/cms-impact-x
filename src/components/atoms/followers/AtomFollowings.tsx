@@ -1,18 +1,18 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
-import { useFollowUser } from "@/http/follow/follow-user";
-import { useUnfollowUser } from "@/http/follow/unfollow-user";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useFollowUser } from "@/http/follow/follow-user";
+import { useUnfollowUser } from "@/http/follow/unfollow-user";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import Link from "next/link";
 
-interface AtomFollowersProps {
+interface AtomFollowingsProps {
   name: string;
   username: string;
   profileImage: string | null;
@@ -23,7 +23,7 @@ interface AtomFollowersProps {
   profileUsername?: string;
 }
 
-export default function AtomFollowers({
+export default function AtomFollowings({
   name,
   username,
   profileImage,
@@ -32,13 +32,12 @@ export default function AtomFollowers({
   isFollowed,
   isCurrentUser = false,
   profileUsername,
-}: AtomFollowersProps) {
+}: AtomFollowingsProps) {
   const queryClient = useQueryClient();
 
   const followMutation = useFollowUser({
     onSuccess: () => {
       toast.success(`Started following ${name}`);
-      // Invalidate queries untuk refresh data
       queryClient.invalidateQueries({
         queryKey: ["followers-user", profileUsername],
       });
@@ -55,7 +54,6 @@ export default function AtomFollowers({
   const unfollowMutation = useUnfollowUser({
     onSuccess: () => {
       toast.success(`Unfollowed ${name}`);
-      // Invalidate queries untuk refresh data
       queryClient.invalidateQueries({
         queryKey: ["followers-user", profileUsername],
       });
@@ -89,7 +87,7 @@ export default function AtomFollowers({
           height={40}
           className="rounded-full object-cover"
         />
-        <div>
+        <div className="space-y-1">
           {isCurrentUser ? (
             <Link href={`/profile`} className="hover:underline">
               <p className="font-medium">
@@ -111,6 +109,7 @@ export default function AtomFollowers({
           </p>
         </div>
       </CardContent>
+
       {!isCurrentUser && (
         <>
           {isFollowed ? (
