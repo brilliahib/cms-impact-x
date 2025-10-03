@@ -6,13 +6,27 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Feed } from "@/types/feeds/feed";
-import { Ellipsis, MessageCircleMore, ThumbsUp } from "lucide-react";
+import {
+  Ellipsis,
+  Loader2,
+  MessageCircleMore,
+  SendHorizontal,
+  ThumbsUp,
+} from "lucide-react";
 import Image from "next/image";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
+import { format, formatDistanceToNow } from "date-fns";
+import { enUS, id } from "date-fns/locale";
 import { buildFromAppURL } from "@/utils/misc";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { useGetAllFeedComment } from "@/http/feeds/comments/get-all-feed-comment";
+import { useState } from "react";
+import { useCreateFeedComment } from "@/http/feeds/comments/create-feed-comment";
+import { useQueryClient } from "@tanstack/react-query";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface CardListFeedProps {
   data?: Feed[];
@@ -52,6 +66,33 @@ function FeedSkeleton() {
 }
 
 export default function CardListFeed({ data, isPending }: CardListFeedProps) {
+  const [activeFeedId, setActiveFeedId] = useState<number | null>(null);
+  const [commentInput, setCommentInput] = useState("");
+
+  const { data: comments, isPending: isCommentPending } = useGetAllFeedComment(
+    activeFeedId!,
+    {
+      enabled: !!activeFeedId,
+    },
+  );
+
+  const queryClient = useQueryClient();
+
+  const { mutate: createComment, isPending: isCreating } = useCreateFeedComment(
+    activeFeedId ?? 0,
+    {
+      onSuccess: () => {
+        setCommentInput("");
+        queryClient.invalidateQueries({
+          queryKey: ["get-all-feed-comments", activeFeedId],
+        });
+        toast.success("Comment added successfully!");
+      },
+      onError: () => {
+        toast.error("Failed to add comment. Please try again.");
+      },
+    },
+  );
   return (
     <div className="w-full space-y-6">
       {isPending
@@ -106,11 +147,11 @@ export default function CardListFeed({ data, isPending }: CardListFeedProps) {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="mb-4 border-b pb-4">
+                <div className="border-b pb-4">
                   <h1 className="text-sm leading-6">{feed.content}</h1>
                 </div>
                 {feed.activity && (
-                  <Card className="pt-0">
+                  <Card className="mt-4 pt-0">
                     <CardHeader className="p-0">
                       <Image
                         src={buildFromAppURL(feed.activity.images)}
@@ -153,14 +194,122 @@ export default function CardListFeed({ data, isPending }: CardListFeedProps) {
                 )}
               </CardContent>
               <CardFooter>
-                <div className="flex items-center gap-4">
-                  <div className="flex cursor-pointer items-center gap-2 text-sm">
-                    <ThumbsUp size={18} />
-                    Like
+                <div className="w-full">
+                  <div className="flex items-center gap-4">
+                    <div className="flex cursor-pointer items-center gap-2 text-sm">
+                      <ThumbsUp size={18} />
+                      Like
+                    </div>
+                    <div
+                      className="flex cursor-pointer items-center gap-2 text-sm"
+                      onClick={() =>
+                        setActiveFeedId(
+                          activeFeedId === feed.id ? null : feed.id,
+                        )
+                      }
+                    >
+                      <MessageCircleMore size={18} />
+                      Comment
+                    </div>
                   </div>
-                  <div className="flex cursor-pointer items-center gap-2 text-sm">
-                    <MessageCircleMore size={18} />
-                    Comment
+                  <div className="w-full">
+                    {activeFeedId === feed.id && (
+                      <div className="mt-4 w-full">
+                        <ScrollArea className="h-50 w-full pb-4">
+                          {isCommentPending ? (
+                            <div className="space-y-4">
+                              {Array.from({ length: 3 }).map((_, i) => (
+                                <div key={i} className="flex items-start gap-3">
+                                  <Skeleton className="h-10 w-10 rounded-full" />
+                                  <div className="w-full space-y-2">
+                                    <Skeleton className="h-4 w-32" />
+                                    <Skeleton className="h-3 w-5/6" />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : comments && comments.data.length > 0 ? (
+                            <div className="space-y-4">
+                              {comments.data.map((comment) => (
+                                <div
+                                  key={comment.id}
+                                  className="flex items-start gap-3"
+                                >
+                                  <Image
+                                    src={
+                                      comment.user.profile_images
+                                        ? buildFromAppURL(
+                                            comment.user.profile_images,
+                                          )
+                                        : "/images/profile/profile-2d.png"
+                                    }
+                                    alt={
+                                      comment.user.first_name ?? "Profile User"
+                                    }
+                                    width={40}
+                                    height={40}
+                                    className="rounded-full border"
+                                  />
+                                  <div className="bg-muted w-full space-y-1 rounded-lg p-3 text-sm">
+                                    <div className="flex items-center gap-2">
+                                      <Link
+                                        href={`/profile/${comment.user.username}`}
+                                        className="hover:underline"
+                                      >
+                                        <h3 className="font-medium">
+                                          {comment.user.first_name}{" "}
+                                          {comment.user.last_name}
+                                        </h3>
+                                      </Link>
+                                      <p className="text-muted-foreground text-xs">
+                                        {formatDistanceToNow(
+                                          new Date(comment.created_at),
+                                          {
+                                            addSuffix: true,
+                                            includeSeconds: true,
+                                            locale: enUS,
+                                          },
+                                        )}
+                                      </p>
+                                    </div>
+                                    <p>{comment.content}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-muted-foreground text-sm">
+                              No comments yet.
+                            </p>
+                          )}
+                        </ScrollArea>
+
+                        <div className="mt-2 flex items-center gap-2">
+                          <Input
+                            placeholder="Write a comment..."
+                            value={commentInput}
+                            onChange={(e) => setCommentInput(e.target.value)}
+                          />
+                          <Button
+                            size="icon"
+                            className="rounded-full"
+                            disabled={!commentInput || isCreating}
+                            onClick={() =>
+                              createComment({
+                                content: commentInput,
+                                mentions: [],
+                              })
+                            }
+                          >
+                            {isCreating ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <SendHorizontal size={16} />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardFooter>
