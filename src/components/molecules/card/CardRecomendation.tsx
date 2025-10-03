@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetAllActivity } from "@/http/activity/get-all-activity";
 import { Activity } from "@/types/activity/activity";
+import { useGetAllActivityByType } from "@/http/activity/get-activity-by-type";
 
 type Props = {
   type: "competition" | "project" | "volunteer";
@@ -22,12 +22,13 @@ export default function CardRecomendation({
   type,
   title,
   description,
-  emptyMessage = `Belum ada ${type}`,
+  emptyMessage = `No ${type} available.`,
 }: Props) {
   const { data: session, status } = useSession();
 
-  const { data, isPending } = useGetAllActivity(
+  const { data, isPending } = useGetAllActivityByType(
     session?.access_token as string,
+    type,
     {
       enabled: status === "authenticated",
     },

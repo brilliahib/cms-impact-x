@@ -2,7 +2,8 @@
 
 import BreadcrumbContent from "@/components/atoms/breadcrumb/BreadcrumbItem";
 import CardFollowingByUsernameContent from "@/components/molecules/card/CardFollowingByUsernameContent";
-// import {useGetFollowingByUsername} from "@/http/follow/get-following-by-username";
+import { useGetFollowingByUsername } from "@/http/follow/get-following-by-username";
+import { useSession } from "next-auth/react";
 
 interface FollowingByUsernameWrapperProps {
   username: string;
@@ -11,15 +12,15 @@ interface FollowingByUsernameWrapperProps {
 export default function FollowingByUsernameWrapper({
   username,
 }: FollowingByUsernameWrapperProps) {
-  // const {data: session, status} = useSession();
+  const { data: session, status } = useSession();
 
-  // const {data, isPending} = useGetFollowingByUsername(
-  //     username,
-  //     session?.access_token as string,
-  //     {
-  //         enabled: status === "authenticated",
-  //     },
-  // );
+  const { data, isPending } = useGetFollowingByUsername(
+    username,
+    session?.access_token as string,
+    {
+      enabled: status === "authenticated",
+    },
+  );
 
   return (
     <>
