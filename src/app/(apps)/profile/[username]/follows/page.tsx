@@ -1,16 +1,16 @@
-import FollowingByUsernameWrapper from "@/components/organisms/profile/following/FollowingByUsernameWrapper";
+import FollowsByUsernameWrapper from "@/components/organisms/profile/following/FollowsByUsernameWrapper";
 
-interface FollowingUserPageProps {
+interface FollowsUserPageProps {
   params: Promise<{ username: string }>;
 }
 
-export default async function FollowingUserPage({
+export default async function FollowsUserPage({
   params,
-}: FollowingUserPageProps) {
+}: FollowsUserPageProps) {
   const { username } = await params;
   return (
     <section>
-      <FollowingByUsernameWrapper username={username} />
+      <FollowsByUsernameWrapper username={username} />
     </section>
   );
 }

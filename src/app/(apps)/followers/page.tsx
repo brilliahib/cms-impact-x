@@ -1,10 +1,10 @@
-import FollowersWrapper from "@/components/organisms/followers/FollowersWrapper";
+import FollowsProfileWrapper from "@/components/organisms/followers/FollowsProfileWrapper";
 
-export default function Followers() {
+export default function FollowsProfilePage() {
   return (
     <>
       <section>
-        <FollowersWrapper />
+        <FollowsProfileWrapper />
       </section>
     </>
   );
