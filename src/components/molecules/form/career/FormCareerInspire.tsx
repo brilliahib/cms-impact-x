@@ -72,7 +72,7 @@ export function FormCareerInspire({ onNext }: { onNext: () => void }) {
               name="category"
               render={({ field }) => (
                 <FormItem className="space-y-1">
-                  <FormLabel>Select your career category</FormLabel>
+                  {/* <FormLabel>Select your career category</FormLabel> */}
                   <FormControl>
                     <ScrollArea className="h-72">
                       <RadioGroup

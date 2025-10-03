@@ -5,6 +5,8 @@ import { FormCareerInspire } from "@/components/molecules/form/career/FormCareer
 import { FormCareerPrefer } from "@/components/molecules/form/career/FormCareerPrefer";
 import { FormCareerChallenge } from "@/components/molecules/form/career/FormCareerChallenge";
 import { FormCareerHardSkill } from "@/components/molecules/form/career/FormCareerHardSkill";
+import { FormCareerSoftSkill } from "@/components/molecules/form/career/FormCareerSoftSkill";
+import { FormCareerRole } from "@/components/molecules/form/career/FormCareerRole";
 
 export default function CareerWrapper() {
   const [step, setStep] = React.useState(1);
@@ -15,7 +17,9 @@ export default function CareerWrapper() {
         {step === 1 && <FormCareerInspire onNext={() => setStep(2)} />}
         {step === 2 && <FormCareerPrefer onNext={() => setStep(3)} />}
         {step === 3 && <FormCareerChallenge onNext={() => setStep(4)} />}
-        {step === 4 && <FormCareerHardSkill onNext={() => alert("Finish!")} />}
+        {step === 4 && <FormCareerHardSkill onNext={() => setStep(5)} />}
+        {step === 5 && <FormCareerSoftSkill onNext={() => setStep(6)} />}
+        {step === 6 && <FormCareerRole onNext={() => setStep(7)} />}
       </div>
     </div>
   );

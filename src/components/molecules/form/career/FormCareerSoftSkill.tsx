@@ -23,8 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-import { careerOptionsChallenge } from "@/constants/career-options-challange";
+import { CareerOptionsSoftSkill } from "@/constants/career-options-softskill";
 
 const FormSchema = z.object({
   categories: z.array(z.string()).refine((value) => value.length > 0, {
@@ -32,7 +31,7 @@ const FormSchema = z.object({
   }),
 });
 
-export function FormCareerHardSkill({ onNext }: { onNext: () => void }) {
+export function FormCareerSoftSkill({ onNext }: { onNext: () => void }) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -41,16 +40,16 @@ export function FormCareerHardSkill({ onNext }: { onNext: () => void }) {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log("Hard skills submitted:", data);
+    console.log("Soft skills submitted:", data);
     onNext();
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Your Hard Skills</CardTitle>
+        <CardTitle>Your Soft Skills</CardTitle>
         <CardDescription>
-          Highlight the skills you enjoy using the most.
+          Tell us about your personal skills to highlight your strengths.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -63,7 +62,7 @@ export function FormCareerHardSkill({ onNext }: { onNext: () => void }) {
                 <FormItem>
                   {/* <FormLabel>Select your career categories</FormLabel> */}
                   <div className="mt-2 space-y-3">
-                    {careerOptionsChallenge.map((option) => (
+                    {CareerOptionsSoftSkill.map((option) => (
                       <FormField
                         key={option.value}
                         control={form.control}
@@ -94,9 +93,6 @@ export function FormCareerHardSkill({ onNext }: { onNext: () => void }) {
                               <FormLabel className="font-normal">
                                 {option.label}
                               </FormLabel>
-                              <p className="text-muted-foreground text-xs">
-                                {option.desc}
-                              </p>
                             </div>
                           </FormItem>
                         )}
