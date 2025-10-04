@@ -45,6 +45,7 @@
     "date-fns": "^4.1.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
+    "framer-motion": "^12.23.22",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
     "lucide-react": "^0.544.0",

@@ -1,9 +1,15 @@
 export const careerOptionsInspire = [
-  { value: "technology", label: "Technology" },
-  { value: "health", label: "Health & Biotechnology" },
-  { value: "environment", label: "Environment & Sustainability" },
-  { value: "social", label: "Social & Humanities" },
-  { value: "arts", label: "Arts & Creative" },
-  { value: "business", label: "Business & Entrepreneurship" },
-  { value: "science", label: "Science & Research" },
+  { value: "Technology", label: "Technology" },
+  { value: "Health & Biotechnology", label: "Health & Biotechnology" },
+  {
+    value: "Environment & Sustainability",
+    label: "Environment & Sustainability",
+  },
+  { value: "Social & Humanities", label: "Social & Humanities" },
+  { value: "Arts & Creative", label: "Arts & Creative" },
+  {
+    value: "Business & Entrepreneurship",
+    label: "Business & Entrepreneurship",
+  },
+  { value: "Science & Research", label: "Science & Research" },
 ];
