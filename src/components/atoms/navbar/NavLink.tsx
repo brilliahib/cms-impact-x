@@ -40,7 +40,7 @@ export default function NavLink() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Link href="/career">Career Path</Link>
+            <Link href="/career-path">Career Path</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>

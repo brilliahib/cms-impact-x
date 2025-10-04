@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import {
   registerSchema,
@@ -104,7 +103,7 @@ export function FormAuthRegister({
         description:
           "You have successfully registered and logged in to your account.",
       });
-      return router.push("/");
+      return router.push("/career");
     },
   });
 
@@ -270,8 +269,8 @@ export function FormAuthRegister({
                   )}
                 />
                 <div className="flex flex-col gap-3">
-                  <Button type="submit" className="w-full">
-                    Register
+                  <Button type="submit" className="w-full" disabled={isPending}>
+                    {isPending ? "Loading..." : "Register"}{" "}
                   </Button>
                 </div>
               </div>
