@@ -94,8 +94,9 @@ const CardProfile = () => {
       <div className="relative -mt-16 ml-4 flex h-[100px] w-[100px] justify-start rounded-full md:-mt-24 md:h-[150px] md:w-[150px]">
         <Image
           src={
-            buildFromAppURL(data?.data.profile_images) ??
-            "/images/profile/profile.jpg"
+            data?.data.profile_images
+              ? buildFromAppURL(data.data.profile_images)
+              : "/images/profile/profile-2d.png"
           }
           alt={session?.user.first_name || "profile"}
           fill
@@ -111,7 +112,10 @@ const CardProfile = () => {
           <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
             <p>{data?.data.role}</p>
             <span className="opacity-30">|</span>
-            <Link href={`/followers`}>
+            <Link
+              href={`/followers`}
+              className="hover:text-sky-600 hover:underline"
+            >
               <p className="text-sky-600">
                 {count?.data.followers_count ?? 0} Followers
               </p>
