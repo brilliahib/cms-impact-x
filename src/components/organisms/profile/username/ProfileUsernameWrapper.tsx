@@ -24,6 +24,7 @@ export default function ProfileByUsernameWrapper({
       enabled: status === "authenticated",
     },
   );
+
   return (
     <>
       <div className="mb-6 w-full">
