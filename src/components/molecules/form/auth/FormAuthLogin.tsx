@@ -141,7 +141,7 @@ export function FormAuthLogin({
               </div>
               <div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Loading..." : "Masuk"}{" "}
+                  {isLoading ? "Loading..." : "Login"}{" "}
                 </Button>
               </div>
             </form>

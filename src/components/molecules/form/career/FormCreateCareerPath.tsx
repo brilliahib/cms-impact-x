@@ -80,6 +80,11 @@ export default function FormCreateCareerPath() {
   useEffect(() => {
     form.setValue("work_hardskills", []);
     form.setValue("work_roles", "");
+    setTouchedSteps((p) => ({
+      ...p,
+      work_hardskills: false,
+      work_roles: false,
+    }));
   }, [inspireValue, form]);
 
   const inspireToCategoryMap: Record<
@@ -171,9 +176,10 @@ export default function FormCreateCareerPath() {
       await createCareerPath(body);
       toast.success("Career path created successfully!", { id: toastId });
 
-      toast.loading("Predicting your career path...");
+      toast.loading("Predicting your career path...", { id: toastId });
       await predictCareer();
-      toast.success("Career path prediction completed!");
+
+      toast.success("Career path prediction completed!", { id: toastId });
 
       queryClient.invalidateQueries({ queryKey: ["get-career-path"] });
       router.push("/career-path");

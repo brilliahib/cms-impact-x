@@ -1,13 +1,25 @@
 "use client";
 
-import BreadcrumbContent from "@/components/atoms/breadcrumb/BreadcrumbItem";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { useGetCareerPath } from "@/http/career/get-career-path";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
+import BreadcrumbContent from "@/components/atoms/breadcrumb/BreadcrumbItem";
+import { useGetCareerPath } from "@/http/career/get-career-path";
+import { useGetPredictionExists } from "@/http/career/get-prediction-exists";
 
 export default function CareerPathWrapper() {
+  const router = useRouter();
   const { data: session, status } = useSession();
+
+  const { data: exists, isPending: isExistsPending } = useGetPredictionExists(
+    session?.access_token as string,
+    {
+      enabled: status === "authenticated",
+    },
+  );
 
   const { data, isPending } = useGetCareerPath(
     session?.access_token as string,
@@ -16,10 +28,42 @@ export default function CareerPathWrapper() {
     },
   );
 
-  if (isPending) {
+  useEffect(() => {
+    if (!isExistsPending && exists && !exists.data.hasCareerPrediction) {
+      router.push("/career");
+    }
+  }, [exists, isExistsPending, router]);
+
+  if (isPending || isExistsPending) {
     return (
-      <section className="flex animate-pulse flex-col gap-6 py-10 text-center">
-        <p className="text-muted-foreground">Loading your career path...</p>
+      <section className="flex flex-col gap-6 py-10">
+        <div className="w-full">
+          <Skeleton className="h-6 w-40" />
+        </div>
+
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-80" />
+        </div>
+
+        <div className="flex gap-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-10 w-24 rounded-lg" />
+          ))}
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="space-y-6">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-20 w-full rounded-lg" />
+            ))}
+          </div>
+          <div className="space-y-6">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full rounded-lg" />
+            ))}
+          </div>
+        </div>
       </section>
     );
   }
@@ -79,6 +123,7 @@ export default function CareerPathWrapper() {
                     </div>
                   </div>
                 </div>
+
                 <div className="space-y-4">
                   <Card>
                     <CardContent>
