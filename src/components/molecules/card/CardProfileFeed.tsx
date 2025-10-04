@@ -105,9 +105,14 @@ export default function CardProfileFeed() {
                 ""
               )}
             </span>
-            <p className="text-sm text-[#0284C7]">
-              {count?.data.followers_count} Followers
-            </p>
+            <Link
+              href={"/followers"}
+              className="hover:text-[#0284C7] hover:underline"
+            >
+              <p className="text-sm text-[#0284C7]">
+                {count?.data.followers_count} Followers
+              </p>
+            </Link>
           </div>
         ) : (
           <div className="flex flex-col gap-6">
