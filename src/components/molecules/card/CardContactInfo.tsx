@@ -43,7 +43,7 @@ export default function CardContactInfo({
         {data?.contact_info.map((info, i) => (
           <div key={i} className="flex items-center gap-4">
             <Link className="h-5 w-5 shrink-0" />
-            <p className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600">
+            <p className="overflow-hidden text-sm text-ellipsis whitespace-nowrap text-sky-600 2xl:text-base">
               {info}
             </p>
           </div>

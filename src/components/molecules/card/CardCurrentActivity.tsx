@@ -25,13 +25,15 @@ export default function CardCurrentActivity({
     },
   );
 
+  const isEmpty = !isPending && (!data?.data || data.data.length === 0);
+
   return (
     <Card className="shadow-xs">
       <CardHeader className="flex items-center justify-between px-4 py-0 pb-6 shadow-xs 2xl:px-6">
         <CardTitle>Current Activity</CardTitle>
       </CardHeader>
       <CardContent className="px-4 2xl:px-6">
-        <ScrollArea className="md:h-60">
+        <ScrollArea className="md:max-h-60">
           <div className="space-y-6">
             {isPending ? (
               <div className="space-y-4">
@@ -59,6 +61,11 @@ export default function CardCurrentActivity({
                   </Card>
                 ))}
               </div>
+            ) : isEmpty ? (
+              // 🚫 Kondisi kosong
+              <p className="text-muted-foreground text-sm">
+                No current activity available.
+              </p>
             ) : data?.data && data.data.length > 0 ? (
               data.data.map((activity) => (
                 <Link key={activity.id} href={`/activity/${activity.id}`}>

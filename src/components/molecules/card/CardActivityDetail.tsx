@@ -16,7 +16,7 @@ import {
 import { Activity } from "@/types/activity/activity";
 import { buildFromAppURL } from "@/utils/misc";
 import { format } from "date-fns";
-import { Clock3, Ellipsis, MapPin, Send, UsersRound } from "lucide-react";
+import { Clock3, MapPin, Send } from "lucide-react";
 import Image from "next/image";
 import { id } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,6 +29,13 @@ import { toast } from "sonner";
 import { useState } from "react";
 import AlertDialogCreateRegistration from "@/components/atoms/alert-dialog/activity/registration/AlertDialogCreateRegistration";
 import { useGetCheckApplyRegistration } from "@/http/activity/registrations/get-check-apply-registration";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface CardActivityDetailProps {
   data?: Activity;
@@ -241,54 +248,75 @@ export default function CardActivityDetail({
               </div>
             </CardHeader>
             <div className="space-y-6">
-              <CardHeader>
-                <div className="flex items-start justify-between gap-6">
-                  <div className="flex flex-1 flex-col gap-2">
-                    <div className="w-full">
-                      <CardTitle className="text-xl">{data?.title}</CardTitle>
-                      <CardDescription className="text-muted-foreground py-2">
-                        {data?.created_at && (
-                          <p>
-                            Posted on:{" "}
-                            {format(new Date(data?.created_at), "d MMMM yyyy", {
-                              locale: id,
-                            })}
-                          </p>
-                        )}
-                      </CardDescription>
-                    </div>
-                    <div className="flex w-3/4 flex-wrap gap-2">
-                      <Badge>{data?.activity_type}</Badge>
-                      <div>
-                        {data?.activity_category.map((category, index) => (
-                          <Badge key={index} variant={"secondary"}>
-                            {category}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <Card className="mt-6 flex flex-row items-center justify-between p-4 shadow-none">
-                      <h1 className="font-medium">Participants</h1>
-                      <Badge
-                        variant={"default"}
-                        className="rounded-full bg-green-100 px-4 text-base text-green-700"
-                      >
-                        {data?.total_participants}/{data?.max_participants}
-                      </Badge>
-                    </Card>
+              <CardHeader className="flex items-start justify-between gap-6">
+                <div className="flex flex-1 flex-col gap-2">
+                  <div className="w-full">
+                    <CardTitle className="text-xl">{data?.title}</CardTitle>
+                    <CardDescription className="text-muted-foreground py-2">
+                      {data?.created_at && (
+                        <p>
+                          Posted on:{" "}
+                          {format(new Date(data?.created_at), "d MMMM yyyy", {
+                            locale: id,
+                          })}
+                        </p>
+                      )}
+                    </CardDescription>
                   </div>
-                  <div className="h-[300px] w-[400px] overflow-hidden rounded-lg">
-                    {data?.images && (
-                      <Image
-                        src={buildFromAppURL(data.images)}
-                        alt="Poster Activity"
-                        className="rounded-lg object-cover"
-                        width={400}
-                        height={300}
-                      />
-                    )}
+
+                  <div className="flex w-3/4 flex-wrap gap-2">
+                    <Badge>{data?.activity_type}</Badge>
+                    <div>
+                      {data?.activity_category.map((category, index) => (
+                        <Badge key={index} variant={"secondary"}>
+                          {category}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
+
+                  <Card className="mt-6 flex flex-row items-center justify-between p-4 shadow-none">
+                    <h1 className="font-medium">Total Participants</h1>
+                    <Badge
+                      variant={"default"}
+                      className="rounded-full bg-green-100 px-4 text-base text-green-700"
+                    >
+                      {data?.total_participants}/{data?.max_participants}
+                    </Badge>
+                  </Card>
                 </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <div className="group h-[200px] w-[300px] cursor-pointer overflow-hidden rounded-lg">
+                      {data?.images && (
+                        <Image
+                          src={buildFromAppURL(data.images)}
+                          alt="Poster Activity"
+                          className="rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
+                          width={300}
+                          height={200}
+                        />
+                      )}
+                    </div>
+                  </DialogTrigger>
+
+                  <DialogContent className="max-w-5xl border-0 bg-transparent p-0 shadow-none">
+                    <VisuallyHidden>
+                      <DialogTitle>Activity Image Preview</DialogTitle>
+                    </VisuallyHidden>
+                    <div className="relative flex h-full w-full items-center justify-center">
+                      {data?.images && (
+                        <Image
+                          src={buildFromAppURL(data.images)}
+                          alt="Poster Activity Full"
+                          width={1200}
+                          height={800}
+                          className="max-h-[80vh] rounded-lg object-contain"
+                        />
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

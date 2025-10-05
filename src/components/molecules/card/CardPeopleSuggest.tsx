@@ -5,7 +5,6 @@ import { useFollowUser } from "@/http/follow/follow-user";
 import { User } from "@/types/user/user";
 import { buildFromAppURL } from "@/utils/misc";
 import { useQueryClient } from "@tanstack/react-query";
-import { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -46,7 +45,7 @@ export default function CardPeopleSuggest({
       <CardContent>
         <div className="flex flex-col gap-4">
           {isPending ? (
-            [...Array(5)].map((_, i) => (
+            [...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center gap-3">
                 <Skeleton className="h-12 w-12 rounded-full border" />
                 <div className="flex flex-1 flex-col gap-1">
@@ -57,7 +56,7 @@ export default function CardPeopleSuggest({
               </div>
             ))
           ) : data && data.length > 0 ? (
-            data.map((user) => (
+            data.slice(0, 3).map((user) => (
               <div key={user.id} className="flex items-center gap-3">
                 <div className="flex flex-1 items-center gap-3">
                   <Image

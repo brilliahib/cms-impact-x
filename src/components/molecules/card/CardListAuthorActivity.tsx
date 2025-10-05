@@ -58,27 +58,50 @@ export default function CardListAuthorActivity({
   data,
   isPending,
 }: CardListAuthorActivityProps) {
+  const isEmpty = !isPending && (!data || data.length === 0);
+
   return (
     <div className="space-y-6">
-      {isPending
-        ? Array.from({ length: 3 }).map((_, i) => <ActivitySkeleton key={i} />)
-        : data?.map((activity) => (
-            <Card key={activity.id}>
-              <CardHeader className="flex items-start justify-between">
-                <div className="space-y-4">
-                  <Link
-                    href={`/activity/${activity.id}`}
-                    className="mb-4 block hover:underline"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <CardTitle>{activity.title}</CardTitle>
-                  </Link>
-                  <div className="flex flex-row gap-2">
-                    <Badge className="capitalize">
-                      {activity.activity_type}
-                    </Badge>
-                    {Array.isArray(activity.activity_category)
-                      ? activity.activity_category.map((category, index) => (
+      {/* Kondisi loading */}
+      {isPending &&
+        Array.from({ length: 3 }).map((_, i) => <ActivitySkeleton key={i} />)}
+
+      {/* Kondisi data kosong */}
+      {isEmpty && (
+        <div className="text-muted-foreground flex flex-col items-center justify-center py-10 text-center">
+          <p className="text-sm">
+            Your activity is empty. Create your own activity!
+          </p>
+        </div>
+      )}
+
+      {/* Kondisi data ada */}
+      {!isPending &&
+        data?.map((activity) => (
+          <Card key={activity.id}>
+            <CardHeader className="flex items-start justify-between">
+              <div className="space-y-4">
+                <Link
+                  href={`/activity/${activity.id}`}
+                  className="mb-4 block hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <CardTitle>{activity.title}</CardTitle>
+                </Link>
+                <div className="flex flex-row gap-2">
+                  <Badge className="capitalize">{activity.activity_type}</Badge>
+                  {Array.isArray(activity.activity_category)
+                    ? activity.activity_category.map((category, index) => (
+                        <Badge
+                          key={index}
+                          variant={"outline"}
+                          className="capitalize"
+                        >
+                          {category}
+                        </Badge>
+                      ))
+                    : JSON.parse(activity.activity_category).map(
+                        (category: string, index: number) => (
                           <Badge
                             key={index}
                             variant={"outline"}
@@ -86,40 +109,34 @@ export default function CardListAuthorActivity({
                           >
                             {category}
                           </Badge>
-                        ))
-                      : JSON.parse(activity.activity_category).map(
-                          (category: string, index: number) => (
-                            <Badge
-                              key={index}
-                              variant={"outline"}
-                              className="capitalize"
-                            >
-                              {category}
-                            </Badge>
-                          ),
-                        )}
-                  </div>
+                        ),
+                      )}
                 </div>
-                <div className="flex flex-row gap-4">
-                  <Badge className="bg-green-500/10 text-green-500">
-                    {activity.total_participants}/{activity.max_participants}
-                  </Badge>
-                  <Ellipsis />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm">
-                  Posted on:{" "}
-                  {format(new Date(activity.created_at), "d MMMM yyyy", {
-                    locale: id,
-                  })}
-                </p>
-              </CardContent>
-              <CardFooter>
-                <Button variant={"outline"}>See Details</Button>
-              </CardFooter>
-            </Card>
-          ))}
+              </div>
+              <div className="flex flex-row gap-4">
+                <Badge className="bg-green-500/10 text-green-500">
+                  {activity.total_participants}/{activity.max_participants}
+                </Badge>
+                <Ellipsis />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground text-sm">
+                Posted on:{" "}
+                {format(new Date(activity.created_at), "d MMMM yyyy", {
+                  locale: id,
+                })}
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Link key={activity.id} href={`/activity'?id=${activity.id}`}>
+                <Button variant={"outline"} className="cursor-pointer">
+                  See Details
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
+        ))}
     </div>
   );
 }
