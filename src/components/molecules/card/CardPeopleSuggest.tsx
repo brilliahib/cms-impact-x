@@ -68,7 +68,7 @@ export default function CardPeopleSuggest({
                     alt={user?.name ?? `${user.first_name} ${user.last_name}`}
                     width={50}
                     height={50}
-                    className="rounded-full border"
+                    className="min-h-[50px] min-w-[50px] rounded-full border object-cover"
                   />
                   <div className="flex flex-col gap-1">
                     <Link

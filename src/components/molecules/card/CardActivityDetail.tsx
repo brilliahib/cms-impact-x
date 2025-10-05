@@ -164,7 +164,7 @@ export default function CardActivityDetail({
                 alt={data?.user.name ?? "Profile User"}
                 width={50}
                 height={50}
-                className="rounded-full border"
+                className="min-h-[50px] min-w-[50px] rounded-full border object-cover"
               />
               <div className="flex flex-col gap-1">
                 <h1 className="font-medium">{data?.user.name}</h1>
@@ -220,7 +220,7 @@ export default function CardActivityDetail({
                                   alt={participant?.name ?? "Profile User"}
                                   width={50}
                                   height={50}
-                                  className="mb-2 rounded-full border"
+                                  className="min-h-[50px] min-w-[50px] rounded-full border object-cover"
                                 />
                                 <div className="text-sm">
                                   <p className="line-clamp-1 font-semibold">

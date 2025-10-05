@@ -193,7 +193,7 @@ export default function CardListActivity({
                           alt={activity?.user.name ?? "Profile User"}
                           width={50}
                           height={50}
-                          className="h-fit rounded-full border"
+                          className="min-h-[50px] min-w-[50px] rounded-full border object-cover"
                         />
                         <div className="space-y-4">
                           <CardTitle>{activity.title}</CardTitle>
