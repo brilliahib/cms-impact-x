@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -29,6 +30,8 @@ import { universities } from "@/constants/university";
 import { useGetProfileUser } from "@/http/profile/get-profile-user";
 import { useUpdateProfileUser } from "@/http/profile/update-profile-user";
 import { cn } from "@/lib/utils";
+import { generateFallbackFromName } from "@/utils/generate-name";
+import { buildFromAppURL } from "@/utils/misc";
 import {
   updateUserAndProfileSchema,
   UpdateUserAndProfileType,
@@ -37,7 +40,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronsUpDown, Plus, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FieldArrayPath, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -48,6 +51,9 @@ export default function FormEditProfile() {
   });
 
   const [open, setOpen] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const defaultValues = useMemo<UpdateUserAndProfileType>(() => {
     return {
@@ -73,6 +79,9 @@ export default function FormEditProfile() {
   useEffect(() => {
     if (data?.data) {
       form.reset(defaultValues);
+      if (data.data.profile_images) {
+        setPreview(buildFromAppURL(data.data.profile_images));
+      }
     }
   }, [data, defaultValues, form]);
 
@@ -106,13 +115,67 @@ export default function FormEditProfile() {
     },
   });
 
-  const onSubmit = (body: UpdateUserAndProfileType) => {
-    editProfileUserHandler({ ...body });
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+    setFile(selectedFile);
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setPreview(objectUrl);
   };
+
+  const handleRemovePhoto = () => {
+    setFile(null);
+    setPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const onSubmit = (body: UpdateUserAndProfileType) => {
+    editProfileUserHandler({
+      ...body,
+      profile_images: file ?? null,
+    });
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
         <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-4 md:flex-row">
+            <Avatar className="h-24 w-24">
+              {preview ? (
+                <AvatarImage src={preview} alt="Profile preview" />
+              ) : (
+                <AvatarFallback className="border-0 text-gray-700">
+                  {generateFallbackFromName(session?.user.first_name ?? "")}
+                </AvatarFallback>
+              )}
+            </Avatar>
+
+            <div className="flex gap-2">
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+              />
+              <Button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Upload Photo
+              </Button>
+              {preview && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleRemovePhoto}
+                >
+                  Remove
+                </Button>
+              )}
+            </div>
+          </div>
           <div className="grid gap-3">
             <div className="grid gap-4 md:grid-cols-1 md:grid-cols-2">
               <FormField
