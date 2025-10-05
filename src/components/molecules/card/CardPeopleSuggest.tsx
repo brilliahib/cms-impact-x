@@ -5,7 +5,6 @@ import { useFollowUser } from "@/http/follow/follow-user";
 import { User } from "@/types/user/user";
 import { buildFromAppURL } from "@/utils/misc";
 import { useQueryClient } from "@tanstack/react-query";
-import { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -31,20 +30,22 @@ export default function CardPeopleSuggest({
   });
 
   return (
-    <Card>
+    <Card className="shadow-xs">
       <CardHeader className="flex items-center justify-between">
         <CardTitle>People You May Know</CardTitle>
         <Button
           variant={"ghost"}
-          className="text-[#0284C7] hover:bg-transparent hover:text-[#0284C7] hover:underline"
+          className="p-0 text-[#0284C7] hover:bg-transparent hover:text-[#0284C7] hover:underline 2xl:px-4 2xl:py-2"
         >
-          <Link href={"/suggest"}>See All</Link>
+          <Link href={"/suggest"} className="text-xs">
+            See All
+          </Link>
         </Button>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4">
           {isPending ? (
-            [...Array(5)].map((_, i) => (
+            [...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center gap-3">
                 <Skeleton className="h-12 w-12 rounded-full border" />
                 <div className="flex flex-1 flex-col gap-1">
@@ -55,7 +56,7 @@ export default function CardPeopleSuggest({
               </div>
             ))
           ) : data && data.length > 0 ? (
-            data.map((user) => (
+            data.slice(0, 3).map((user) => (
               <div key={user.id} className="flex items-center gap-3">
                 <div className="flex flex-1 items-center gap-3">
                   <Image
@@ -67,7 +68,7 @@ export default function CardPeopleSuggest({
                     alt={user?.name ?? `${user.first_name} ${user.last_name}`}
                     width={50}
                     height={50}
-                    className="rounded-full border"
+                    className="min-h-[50px] min-w-[50px] rounded-full border object-cover"
                   />
                   <div className="flex flex-col gap-1">
                     <Link
@@ -89,6 +90,7 @@ export default function CardPeopleSuggest({
                   variant={"outline"}
                   size={"sm"}
                   onClick={() => followMutation.mutate(user.username)}
+                  className="text-xs 2xl:text-sm"
                 >
                   Follow
                 </Button>

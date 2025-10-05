@@ -29,12 +29,12 @@ export default function CardProfileFeed() {
 
   if (status === "loading" || isPending) {
     return (
-      <Card className="w-full overflow-hidden pt-0">
-        <div className="relative h-32 w-full md:h-36">
+      <Card className="w-full overflow-hidden pt-0 shadow-xs">
+        <div className="relative h-16 w-full md:h-24 2xl:h-32">
           <Skeleton className="h-full w-full" />
         </div>
-        <div className="relative mx-auto -mt-20 flex h-[100px] w-[100px]">
-          <Skeleton className="h-[100px] w-[100px] rounded-full border-4 border-white shadow-md" />
+        <div className="relative mx-auto -mt-20 flex h-[80px] w-[80px]">
+          <Skeleton className="h-[80px] w-[80px] rounded-full border-4 border-white shadow-md" />
         </div>
         <CardContent>
           <div className="flex flex-col items-center gap-3 text-center">
@@ -48,9 +48,9 @@ export default function CardProfileFeed() {
   }
 
   return (
-    <Card className="w-full overflow-hidden pt-0">
+    <Card className="w-full overflow-hidden pt-0 shadow-xs">
       {/* background */}
-      <div className="relative h-32 w-full md:h-36">
+      <div className="relative h-16 w-full md:h-24 2xl:h-32">
         {session ? (
           <Image
             src="/images/profile/bg.jpg"
@@ -64,7 +64,7 @@ export default function CardProfileFeed() {
       </div>
 
       {/* profile picture */}
-      <div className="relative mx-auto -mt-20 flex h-[100px] w-[100px] md:h-[100px] md:w-[100px]">
+      <div className="relative mx-auto -mt-16 flex h-[72px] w-[72px]">
         {session ? (
           <Image
             src={
@@ -73,8 +73,8 @@ export default function CardProfileFeed() {
                 : "/images/profile/profile-2d.png"
             }
             alt={data?.data.first_name ?? "Profile User"}
-            width={100}
-            height={100}
+            width={72}
+            height={72}
             className="rounded-full border-4 border-white object-cover shadow-md"
           />
         ) : (
@@ -89,7 +89,7 @@ export default function CardProfileFeed() {
 
       <CardContent>
         {session ? (
-          <div className="flex flex-col items-center gap-3 text-center">
+          <div className="-mt-2 flex flex-col items-center gap-3 text-center">
             <Link href={`/profile`} className="hover:underline">
               <h1 className="text-lg font-semibold">
                 {session.user.first_name} {session.user.last_name}
@@ -105,10 +105,7 @@ export default function CardProfileFeed() {
                 ""
               )}
             </span>
-            <Link
-              href={"/followers"}
-              className="hover:text-[#0284C7] hover:underline"
-            >
+            <Link href={`/followers`}>
               <p className="text-sm text-[#0284C7]">
                 {count?.data.followers_count} Followers
               </p>

@@ -2,15 +2,27 @@
 
 import { useSession } from "next-auth/react";
 import CardListActivity from "@/components/molecules/card/CardListActivity";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CardActivityDetail from "@/components/molecules/card/CardActivityDetail";
 import { useGetDetailActivity } from "@/http/activity/get-detail-activity";
 import { useGetAllActivityByType } from "@/http/activity/get-activity-by-type";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function ActivityContent() {
-  const [activityType, setActivityType] = useState<string>("");
-
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Ambil `type` dari query param
+  const typeFromUrl = searchParams.get("type") || "";
+  const [activityType, setActivityType] = useState<string>(typeFromUrl);
+
+  // Update state kalau param di URL berubah
+  useEffect(() => {
+    setActivityType(typeFromUrl);
+  }, [typeFromUrl]);
+
+  // Fetch data aktivitas berdasarkan type
   const { data, isPending } = useGetAllActivityByType(
     session?.access_token as string,
     activityType,
@@ -20,8 +32,13 @@ export default function ActivityContent() {
   );
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const activityIdFromUrl = searchParams.get("id");
 
-  const defaultId = selectedId ?? data?.data[0]?.id ?? null;
+  const defaultId =
+    selectedId ??
+    (activityIdFromUrl
+      ? Number(activityIdFromUrl)
+      : (data?.data[0]?.id ?? null));
 
   const { data: detail, isPending: isDetailPending } = useGetDetailActivity(
     defaultId!,
@@ -31,13 +48,20 @@ export default function ActivityContent() {
     },
   );
 
+  // Saat user ubah dropdown "Select Activity Type"
+  const handleTypeChange = (type: string) => {
+    setActivityType(type);
+    const query = type ? `?type=${type}` : "";
+    router.push(`/activity${query}`);
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div className="flex flex-col gap-4 md:flex-row md:gap-6">
       <CardListActivity
         data={data?.data}
         isPending={isPending}
         onSelect={(id) => setSelectedId(id)}
-        onTypeChange={setActivityType}
+        onTypeChange={handleTypeChange}
         selectedType={activityType === "" ? "all" : activityType}
       />
 

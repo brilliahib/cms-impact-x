@@ -10,6 +10,12 @@ import { Download, Settings } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const CardProfile = () => {
   const { data: session, status } = useSession();
@@ -104,7 +110,7 @@ const CardProfile = () => {
         />
       </div>
 
-      <div className="-mt-0 flex flex-col items-start gap-4 px-6 md:-mt-24 md:flex-row md:items-center md:gap-6">
+      <div className="-mt-0 flex flex-col items-start gap-4 px-6 md:-mt-22 md:flex-row md:items-center md:gap-6">
         <div className="space-y-1 md:ml-40">
           <h2 className="text-lg font-bold md:text-xl">
             {session?.user.first_name} {session?.user.last_name}
@@ -137,15 +143,8 @@ const CardProfile = () => {
         </div>
       </div>
 
-      <div className="flex flex-col justify-between gap-6 p-6 md:flex-row">
-        <div className="flex-1">
-          <CardTitle className="pb-2 text-base md:pb-4 md:text-lg">
-            About
-          </CardTitle>
-          <CardDescription className="mb-4 text-justify text-xs tracking-wider md:text-base">
-            {data?.data.about_description ?? "-"}
-          </CardDescription>
-
+      <div className="flex flex-col items-start justify-between gap-4 p-6 md:-mt-4">
+        <div className="flex w-full items-center justify-between gap-2">
           <div className="space-y-2">
             <h3 className="text-lg font-semibold">Skills</h3>
             <div className="flex flex-wrap items-center gap-4">
@@ -159,23 +158,37 @@ const CardProfile = () => {
               ))}
             </div>
           </div>
-        </div>
-
-        <div className="flex basis-full flex-row items-center gap-2 md:basis-1/5">
-          <Image
-            src="/images/profile/undip.png"
-            width={50}
-            height={50}
-            alt="undip"
-            className="rounded-md"
-          />
-          <div className="flex flex-col gap-1">
-            <h2 className="text-xs font-semibold md:text-sm">
-              {data?.data.university ?? "-"}
-            </h2>
-            <p className="text-xs">{data?.data.major ?? "-"}</p>
+          <div className="mr-8 flex items-center gap-4">
+            <Image
+              src="/images/profile/undip.png"
+              width={50}
+              height={50}
+              alt="undip"
+              className="rounded-md"
+            />
+            <div className="flex flex-col gap-1">
+              <h2 className="text-xs font-semibold md:text-sm">
+                {data?.data.university ?? "-"}
+              </h2>
+              <p className="text-xs">{data?.data.major ?? "-"}</p>
+            </div>
           </div>
         </div>
+        <Accordion type="single" collapsible className="w-full p-0">
+          <AccordionItem value="about">
+            <AccordionTrigger className="text-muted-foreground justify-center rounded-none border-t pt-4 pb-0 text-sm font-medium hover:underline">
+              See Details
+            </AccordionTrigger>
+            <AccordionContent>
+              <CardTitle className="pb-2 text-base md:pb-4 md:text-lg">
+                About
+              </CardTitle>
+              <CardDescription className="mt-2 text-justify text-xs md:text-sm">
+                {data?.data.about_description ?? "-"}
+              </CardDescription>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </Card>
   );
