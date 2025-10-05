@@ -27,6 +27,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useCreateLikeFeed } from "@/http/feeds/like/create-like-feed";
 
 interface CardListFeedProps {
   data?: Feed[];
@@ -93,6 +94,19 @@ export default function CardListFeed({ data, isPending }: CardListFeedProps) {
       },
     },
   );
+
+  const { mutate: likeFeed, isPending: isLikePending } = useCreateLikeFeed({
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get-all-feed"],
+      });
+      toast.success("Liked successfully!");
+    },
+    onError: () => {
+      toast.error("Failed to like this post");
+    },
+  });
+
   return (
     <div className="w-full space-y-6">
       {isPending
@@ -198,10 +212,26 @@ export default function CardListFeed({ data, isPending }: CardListFeedProps) {
               <CardFooter>
                 <div className="w-full">
                   <div className="flex items-center gap-4">
-                    <div className="flex cursor-pointer items-center gap-2 text-sm">
-                      <ThumbsUp size={18} />
-                      Like
+                    <div
+                      className="flex cursor-pointer items-center gap-2 text-sm"
+                      onClick={() => {
+                        if (isLikePending) return;
+                        likeFeed(feed.id);
+                      }}
+                    >
+                      <ThumbsUp
+                        size={18}
+                        color={feed.is_liked ? "red" : "currentColor"}
+                      />
+                      <p
+                        className={
+                          feed.is_liked ? "font-medium text-red-500" : ""
+                        }
+                      >
+                        {feed.total_likes}
+                      </p>
                     </div>
+
                     <div
                       className="flex cursor-pointer items-center gap-2 text-sm"
                       onClick={() =>
@@ -211,7 +241,7 @@ export default function CardListFeed({ data, isPending }: CardListFeedProps) {
                       }
                     >
                       <MessageCircleMore size={18} />
-                      Comment
+                      <p>{feed.total_comments}</p>
                     </div>
                   </div>
                   <div className="w-full">
