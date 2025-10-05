@@ -8,6 +8,7 @@ import { useGetCountFollowUser } from "@/http/follow/get-count-follow-user";
 import { useGetIsFollowingUser } from "@/http/follow/get-is-following-user";
 import { useUnfollowUser } from "@/http/follow/unfollow-user";
 import { useGetProfileByUsername } from "@/http/profile/get-profile-by-username";
+import { useGetUserByUsername } from "@/http/user/get-user-by-username";
 import { buildFromAppURL } from "@/utils/misc";
 import { useQueryClient } from "@tanstack/react-query";
 import { Download, Plus, Settings } from "lucide-react";
@@ -23,6 +24,14 @@ interface CardProfileByUsernameProps {
 const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
   const { data: session, status } = useSession();
   const { data, isPending } = useGetProfileByUsername(
+    username,
+    session?.access_token as string,
+    {
+      enabled: status === "authenticated",
+    },
+  );
+
+  const { data: user, isPending: isUserPending } = useGetUserByUsername(
     username,
     session?.access_token as string,
     {
@@ -162,7 +171,7 @@ const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
       <div className="-mt-0 flex flex-col items-start gap-4 px-6 md:-mt-24 md:flex-row md:items-center md:gap-6">
         <div className="space-y-1 md:ml-40">
           <h2 className="text-lg font-bold md:text-xl">
-            {session?.user.first_name} {session?.user.last_name}
+            {user?.data.first_name} {user?.data.last_name}
           </h2>
           <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
             <p>{data?.data && data.data.role ? data.data.role : "-"}</p>
