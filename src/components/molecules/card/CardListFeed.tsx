@@ -111,7 +111,7 @@ export default function CardListFeed({ data, isPending }: CardListFeedProps) {
                       alt={feed?.user.name ?? "Profile User"}
                       width={50}
                       height={50}
-                      className="rounded-full border"
+                      className="rounded-full border object-cover"
                     />
                     <div className="flex flex-col gap-1">
                       <Link
