@@ -31,14 +31,16 @@ export default function CardPeopleSuggest({
   });
 
   return (
-    <Card>
+    <Card className="shadow-xs">
       <CardHeader className="flex items-center justify-between">
         <CardTitle>People You May Know</CardTitle>
         <Button
           variant={"ghost"}
-          className="text-[#0284C7] hover:bg-transparent hover:text-[#0284C7] hover:underline"
+          className="p-0 text-[#0284C7] hover:bg-transparent hover:text-[#0284C7] hover:underline 2xl:px-4 2xl:py-2"
         >
-          <Link href={"/suggest"}>See All</Link>
+          <Link href={"/suggest"} className="text-xs">
+            See All
+          </Link>
         </Button>
       </CardHeader>
       <CardContent>
@@ -89,6 +91,7 @@ export default function CardPeopleSuggest({
                   variant={"outline"}
                   size={"sm"}
                   onClick={() => followMutation.mutate(user.username)}
+                  className="text-xs 2xl:text-sm"
                 >
                   Follow
                 </Button>

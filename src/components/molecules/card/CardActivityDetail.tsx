@@ -6,6 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Activity } from "@/types/activity/activity";
 import { buildFromAppURL } from "@/utils/misc";
 import { format } from "date-fns";
@@ -74,7 +81,7 @@ export default function CardActivityDetail({
 
   if (isPending) {
     return (
-      <Card>
+      <Card className="w-full md:flex-3">
         <CardHeader className="border-b-2 pb-4">
           <div className="flex justify-between">
             <div className="flex items-center gap-3">
@@ -136,9 +143,9 @@ export default function CardActivityDetail({
   }
 
   return (
-    <>
+    <div className="w-full md:flex-3">
       <Card>
-        <CardHeader className="border-b-2 pb-4">
+        <CardHeader className="border-b pb-4">
           <div className="flex justify-between">
             <div className="flex items-center gap-3">
               <Image
@@ -182,45 +189,52 @@ export default function CardActivityDetail({
         </CardHeader>
         <ScrollArea className="h-[60vh] w-full">
           <div className="space-y-6">
-            <CardHeader className="border-b-2 pb-4">
-              <CardTitle>Joined</CardTitle>
-              <CardDescription>
-                Participants who have joined your activity
-              </CardDescription>
-              <div className="space-y-4 py-6">
+            <CardHeader className="border-b pb-4">
+              <div className="space-y-4">
                 {data?.participants && data.participants.length > 0 ? (
-                  data.participants.map((participant) => (
-                    <Card className="px-3 py-2" key={participant.id}>
-                      <div className="flex items-center justify-between p-4">
-                        <div className="flex flex-row items-center gap-3">
-                          <Image
-                            src={
-                              participant?.profile_images
-                                ? buildFromAppURL(participant?.profile_images)
-                                : "/images/profile/profile-2d.png"
-                            }
-                            alt={participant?.name ?? "Profile User"}
-                            width={50}
-                            height={50}
-                            className="rounded-full border"
-                          />
-                          <div className="flex flex-col gap-1 text-sm">
-                            <p className="font-semibold">{participant.name}</p>
-                            <div className="text-muted-foreground flex flex-row gap-1">
-                              <p>{participant.role} </p>
-                              <span className="opacity-30">|</span>
-                              <p>{participant.university}</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <Ellipsis />
-                        </div>
-                      </div>
-                    </Card>
-                  ))
+                  <div className="relative flex items-center justify-center">
+                    <Carousel className="w-full max-w-6xl">
+                      <CarouselContent className="-ml-2 flex items-stretch md:-ml-4">
+                        {data.participants.map((participant) => (
+                          <CarouselItem
+                            key={participant.id}
+                            className="basis-full pl-2 md:basis-1/2 md:pl-4 2xl:basis-1/3"
+                          >
+                            <Card className="h-full px-0 py-2 shadow-none">
+                              <CardContent className="flex items-center gap-4">
+                                <Image
+                                  src={
+                                    participant?.profile_images
+                                      ? buildFromAppURL(
+                                          participant?.profile_images,
+                                        )
+                                      : "/images/profile/profile-2d.png"
+                                  }
+                                  alt={participant?.name ?? "Profile User"}
+                                  width={50}
+                                  height={50}
+                                  className="mb-2 rounded-full border"
+                                />
+                                <div className="text-sm">
+                                  <p className="line-clamp-1 font-semibold">
+                                    {participant.name}
+                                  </p>
+                                  <p className="text-muted-foreground line-clamp-1 text-xs">
+                                    {participant.role}
+                                  </p>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+
+                      <CarouselPrevious className="hover:bg-muted absolute top-1/2 left-2 z-10 -translate-y-1/2 cursor-pointer rounded-full bg-white shadow-md transition-colors" />
+                      <CarouselNext className="hover:bg-muted absolute top-1/2 right-2 z-10 -translate-y-1/2 cursor-pointer rounded-full bg-white shadow-md transition-colors" />
+                    </Carousel>
+                  </div>
                 ) : (
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-center text-sm">
                     No participants yet.
                   </p>
                 )}
@@ -228,18 +242,10 @@ export default function CardActivityDetail({
             </CardHeader>
             <div className="space-y-6">
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2">
-                    <div>
-                      <div className="flex flex-row items-center gap-8">
-                        <CardTitle className="text-xl">{data?.title}</CardTitle>
-                        <Badge
-                          variant={"default"}
-                          className="rounded-full bg-green-100 px-4 text-base text-green-700"
-                        >
-                          {data?.total_participants}/{data?.max_participants}
-                        </Badge>
-                      </div>
+                <div className="flex items-start justify-between gap-6">
+                  <div className="flex flex-1 flex-col gap-2">
+                    <div className="w-full">
+                      <CardTitle className="text-xl">{data?.title}</CardTitle>
                       <CardDescription className="text-muted-foreground py-2">
                         {data?.created_at && (
                           <p>
@@ -261,14 +267,23 @@ export default function CardActivityDetail({
                         ))}
                       </div>
                     </div>
+                    <Card className="mt-6 flex flex-row items-center justify-between p-4 shadow-none">
+                      <h1 className="font-medium">Participants</h1>
+                      <Badge
+                        variant={"default"}
+                        className="rounded-full bg-green-100 px-4 text-base text-green-700"
+                      >
+                        {data?.total_participants}/{data?.max_participants}
+                      </Badge>
+                    </Card>
                   </div>
-                  <div>
+                  <div className="h-[300px] w-[400px] overflow-hidden rounded-lg">
                     {data?.images && (
                       <Image
                         src={buildFromAppURL(data.images)}
                         alt="Poster Activity"
-                        className="max-h-[200px] rounded-lg object-cover md:max-h-[200px]"
-                        width={300}
+                        className="rounded-lg object-cover"
+                        width={400}
                         height={300}
                       />
                     )}
@@ -276,8 +291,8 @@ export default function CardActivityDetail({
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex flex-row justify-between gap-4">
-                  <Card className="flex-1 p-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <Card className="p-4">
                     <div className="flex items-center gap-2">
                       <MapPin size={20} />
                       <h1 className="text-sm font-medium">Location</h1>
@@ -285,7 +300,7 @@ export default function CardActivityDetail({
                     <p className="font-medium">{data?.location ?? ""}</p>
                   </Card>
 
-                  <Card className="flex-1 p-4">
+                  <Card className="p-4">
                     <div className="flex gap-2">
                       <Clock3 size={20} />
                       <h1 className="text-sm font-medium">Duration</h1>
@@ -301,16 +316,6 @@ export default function CardActivityDetail({
                         })}
                       </p>
                     )}
-                  </Card>
-
-                  <Card className="flex-1 p-4">
-                    <div className="flex gap-2">
-                      <UsersRound size={20} />
-                      <h1 className="text-sm font-medium">Max Participants</h1>
-                    </div>
-                    <p className="font-medium">
-                      {data?.max_participants ?? 0} People
-                    </p>
                   </Card>
                 </div>
                 <div>
@@ -344,6 +349,6 @@ export default function CardActivityDetail({
         confirmRegistration={confirmApply}
         isPending={createRegistration.isPending}
       />
-    </>
+    </div>
   );
 }

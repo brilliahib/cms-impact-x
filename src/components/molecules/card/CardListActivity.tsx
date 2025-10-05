@@ -16,7 +16,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useState, useMemo } from "react";
+import { Separator } from "@/components/ui/separator";
 
 interface CardListActivityProps {
   data?: Activity[];
@@ -37,8 +39,8 @@ function ActivitySkeleton() {
             <div className="flex flex-col gap-2">
               <Skeleton className="h-5 w-40" />
               <div className="flex gap-2">
-                <Skeleton className="h-5 w-20 rounded-full" />{" "}
-                <Skeleton className="h-5 w-16 rounded-full" />{" "}
+                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-5 w-16 rounded-full" />
                 <Skeleton className="h-5 w-16 rounded-full" />
               </div>
             </div>
@@ -60,12 +62,59 @@ export default function CardListActivity({
   onTypeChange,
   selectedType,
 }: CardListActivityProps) {
-  const [selected, setSelected] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [tempSelected, setTempSelected] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  // 🔍 Filter berdasarkan pencarian dan kategori
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+
+    return data.filter((activity) => {
+      const matchesSearch = activity.title
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+      const categories = Array.isArray(activity.activity_category)
+        ? activity.activity_category
+        : JSON.parse(activity.activity_category);
+
+      const matchesCategory =
+        selectedCategories.length === 0 ||
+        selectedCategories.some((cat) =>
+          categories
+            .map((c: string) => c.toLowerCase())
+            .includes(cat.toLowerCase()),
+        );
+
+      const matchesType =
+        !selectedType ||
+        selectedType === "all" ||
+        activity.activity_type.toLowerCase() === selectedType.toLowerCase();
+
+      return matchesSearch && matchesCategory && matchesType;
+    });
+  }, [data, searchTerm, selectedCategories, selectedType]);
+
+  // ✅ Apply filter hanya ketika tombol ditekan
+  const handleApplyFilter = () => {
+    setSelectedCategories(tempSelected);
+  };
+
   return (
-    <Card className="h-fit w-full">
+    <Card className="w-full md:flex-1">
       <CardContent className="space-y-6">
-        <SearchInput placeholder="Search Activity..." fullWidth />
         <div className="flex items-center gap-4">
+          <SearchInput
+            placeholder="Search Activity..."
+            fullWidth
+            value={searchTerm}
+            onChange={(value) => setSearchTerm(value)}
+          />
+        </div>
+
+        {/* 🎛️ Filter */}
+        <div className="flex gap-4">
           {showSelect && (
             <Select
               value={selectedType || "all"}
@@ -73,7 +122,7 @@ export default function CardListActivity({
                 onTypeChange?.(value === "all" ? "" : value)
               }
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Select activity" />
               </SelectTrigger>
               <SelectContent>
@@ -88,15 +137,9 @@ export default function CardListActivity({
             options={[
               { value: "science", label: "Science & Research" },
               { value: "math", label: "Mathematics" },
-              {
-                value: "technology",
-                label: "Technology & Innovation",
-              },
+              { value: "technology", label: "Technology & Innovation" },
               { value: "engineering", label: "Engineering" },
-              {
-                value: "business",
-                label: "Business & Entrepreneurship",
-              },
+              { value: "business", label: "Business & Entrepreneurship" },
               { value: "economics", label: "Economics" },
               { value: "law", label: "Law & Debate" },
               { value: "medicine", label: "Medical & Health" },
@@ -105,38 +148,37 @@ export default function CardListActivity({
               { value: "music", label: "Music & Performance" },
               { value: "literature", label: "Literature & Writing" },
               { value: "sports", label: "Sports & E-Sports" },
-              {
-                value: "environment",
-                label: "Environment & Sustainability",
-              },
-              {
-                value: "volunteer",
-                label: "Volunteer / Community Service",
-              },
+              { value: "environment", label: "Environment & Sustainability" },
+              { value: "volunteer", label: "Volunteer / Community Service" },
               { value: "competition", label: "General Competition" },
             ]}
             placeholder="Select activity category"
             className="flex-1"
-            value={selected}
-            onValueChange={(values) => setSelected(values)}
+            value={tempSelected}
+            onValueChange={(values) => setTempSelected(values)}
+          />
+
+          <Button
+            variant="outline"
+            className="cursor-pointer text-sm"
+            onClick={handleApplyFilter}
           >
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="project">Project</SelectItem>
-            <SelectItem value="competition">Competition</SelectItem>
-            <SelectItem value="volunteer">Volunteer</SelectItem>
-          </MultiSelect>
+            Apply Filter
+          </Button>
         </div>
+
+        {/* 📋 Daftar Activity */}
         <ScrollArea className="h-[60vh] w-full">
           <div>
             {isPending ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <ActivitySkeleton key={i} />
               ))
-            ) : data && data.length > 0 ? (
-              data.map((activity) => (
+            ) : filteredData.length > 0 ? (
+              filteredData.map((activity) => (
                 <Card
                   key={activity.id}
-                  className="hover:bg-accent w-full cursor-pointer rounded-none! border-0 border-t border-b shadow-none"
+                  className="hover:bg-accent w-full cursor-pointer rounded-none border-none pb-0 shadow-none"
                   onClick={() => onSelect?.(activity.id)}
                 >
                   <CardContent>
@@ -155,7 +197,7 @@ export default function CardListActivity({
                         />
                         <div className="space-y-4">
                           <CardTitle>{activity.title}</CardTitle>
-                          <div className="flex flex-row gap-2">
+                          <div className="flex flex-row flex-wrap gap-2">
                             <Badge className="capitalize">
                               {activity.activity_type}
                             </Badge>
@@ -164,7 +206,7 @@ export default function CardListActivity({
                                   (category, index) => (
                                     <Badge
                                       key={index}
-                                      variant={"secondary"}
+                                      variant="secondary"
                                       className="capitalize"
                                     >
                                       {category}
@@ -175,7 +217,7 @@ export default function CardListActivity({
                                   (category: string, index: number) => (
                                     <Badge
                                       key={index}
-                                      variant={"secondary"}
+                                      variant="secondary"
                                       className="capitalize"
                                     >
                                       {category}
@@ -193,11 +235,12 @@ export default function CardListActivity({
                       </div>
                     </div>
                   </CardContent>
+                  <Separator className="m-o p-0" />
                 </Card>
               ))
             ) : (
               <div className="flex items-center justify-center py-10 text-gray-500">
-                No activities available.
+                No matching activities found.
               </div>
             )}
           </div>

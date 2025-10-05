@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Activity } from "@/types/activity/activity";
 import { useGetAllActivityByType } from "@/http/activity/get-activity-by-type";
+import Link from "next/link";
 
 type Props = {
   type: "competition" | "project" | "volunteer";
@@ -40,12 +41,12 @@ export default function CardRecomendation({
   );
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="shadow-xs">
+      <CardHeader className="px-4 2xl:px-6">
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-4 2xl:px-6">
         <div className="flex flex-col gap-4">
           {/* Loading state */}
           {isPending &&
@@ -75,33 +76,38 @@ export default function CardRecomendation({
 
           {/* Render max 3 */}
           {dataFiltered?.slice(0, 3).map((activity: Activity) => (
-            <Card key={activity.id} className="p-2">
-              <CardContent className="space-y-2 p-1">
-                <div className="flex justify-between">
-                  <h1 className="line-clamp-1 text-sm font-medium">
-                    {activity.title}
-                  </h1>
-                  <Badge className="rounded-full bg-green-500/20 text-green-500">
-                    {activity.total_participants}/{activity.max_participants}
-                  </Badge>
-                </div>
+            <Link key={activity.id} href={`/activity?id=${activity.id}`}>
+              <Card
+                key={activity.id}
+                className="p-2 shadow-none hover:bg-gray-50"
+              >
+                <CardContent className="space-y-2 p-1">
+                  <div className="flex justify-between">
+                    <h1 className="line-clamp-1 text-sm font-medium">
+                      {activity.title}
+                    </h1>
+                    <Badge className="rounded-full bg-green-500/20 text-green-500">
+                      {activity.total_participants}/{activity.max_participants}
+                    </Badge>
+                  </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge>{type}</Badge>
-                  {activity.activity_category.map(
-                    (cat: string, index: number) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="text-muted-foreground"
-                      >
-                        {cat}
-                      </Badge>
-                    ),
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge>{type}</Badge>
+                    {activity.activity_category.map(
+                      (cat: string, index: number) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="text-muted-foreground"
+                        >
+                          {cat}
+                        </Badge>
+                      ),
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </CardContent>

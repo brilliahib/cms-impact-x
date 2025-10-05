@@ -125,6 +125,6 @@
     @apply mx-auto max-w-[1280px] px-4 md:px-[2%];
   }
   .pad-x-xl {
-    @apply px-4 md:px-[2%] lg:px-[6%] xl:px-[8%];
+    @apply px-4 md:px-[2%] lg:px-[4%] xl:px-[6%];
   }
 }

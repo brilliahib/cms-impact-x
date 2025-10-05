@@ -16,7 +16,7 @@ export default function HomeRightContent() {
   );
 
   return (
-    <div className="flex hidden flex-col gap-6 md:flex">
+    <div className="hidden flex-col gap-6 md:flex">
       <CardPeopleSuggest data={data?.data} isPending={isPending} />
       <CardRecomendation
         type="project"
