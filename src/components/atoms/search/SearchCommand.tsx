@@ -64,7 +64,11 @@ export default function SearchCommand() {
       />
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput value={query} onValueChange={setQuery} />
+        <CommandInput
+          value={query}
+          onValueChange={setQuery}
+          placeholder="Type a username to search..."
+        />
         <CommandList>
           <CommandEmpty>
             {query ? "No users found." : "Start typing to search."}
