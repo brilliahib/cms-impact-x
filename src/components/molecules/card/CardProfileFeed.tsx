@@ -12,29 +12,29 @@ import { useGetCountFollowUser } from "@/http/follow/get-count-follow-user";
 
 export default function CardProfileFeed() {
   const { data: session, status } = useSession();
-  const { data, isPending } = useGetProfileSummary(
-    session?.access_token as string,
-    {
-      enabled: status === "authenticated",
-    },
-  );
+  const token = session?.access_token;
+  const username = session?.user?.username;
+
+  const { data, isPending } = useGetProfileSummary(token!, {
+    enabled: !!token,
+  });
 
   const { data: count, isPending: isCountPending } = useGetCountFollowUser(
-    session?.user.username as string,
-    session?.access_token as string,
+    username!,
+    token!,
     {
-      enabled: status === "authenticated",
+      enabled: !!token && !!username,
     },
   );
 
-  if (status === "loading" || isPending) {
+  if (status === "loading") {
     return (
-      <Card className="w-full overflow-hidden pt-0">
-        <div className="relative h-32 w-full md:h-36">
+      <Card className="w-full overflow-hidden pt-0 shadow-xs">
+        <div className="relative h-16 w-full md:h-24 2xl:h-32">
           <Skeleton className="h-full w-full" />
         </div>
-        <div className="relative mx-auto -mt-20 flex h-[100px] w-[100px]">
-          <Skeleton className="h-[100px] w-[100px] rounded-full border-4 border-white shadow-md" />
+        <div className="relative mx-auto -mt-20 flex h-[80px] w-[80px]">
+          <Skeleton className="h-[80px] w-[80px] rounded-full border-4 border-white shadow-md" />
         </div>
         <CardContent>
           <div className="flex flex-col items-center gap-3 text-center">
@@ -47,74 +47,20 @@ export default function CardProfileFeed() {
     );
   }
 
-  return (
-    <Card className="w-full overflow-hidden pt-0">
-      {/* background */}
-      <div className="relative h-32 w-full md:h-36">
-        {session ? (
-          <Image
-            src="/images/profile/bg.jpg"
-            alt="background"
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="bg-muted h-full w-full" />
-        )}
-      </div>
-
-      {/* profile picture */}
-      <div className="relative mx-auto -mt-20 flex h-[100px] w-[100px] md:h-[100px] md:w-[100px]">
-        {session ? (
-          <Image
-            src={
-              data?.data.profile?.profile_images
-                ? buildFromAppURL(data.data.profile.profile_images)
-                : "/images/profile/profile-2d.png"
-            }
-            alt={data?.data.first_name ?? "Profile User"}
-            width={100}
-            height={100}
-            className="rounded-full border-4 border-white object-cover shadow-md"
-          />
-        ) : (
+  if (!session) {
+    return (
+      <Card className="w-full overflow-hidden pt-0 shadow-xs">
+        <div className="bg-muted relative h-16 w-full md:h-24 2xl:h-32" />
+        <div className="relative mx-auto -mt-16 flex h-[72px] w-[72px]">
           <Image
             src="/images/profile/no-profile.png"
             alt="profile"
             fill
             className="rounded-full border-4 border-white object-cover shadow-md"
           />
-        )}
-      </div>
+        </div>
 
-      <CardContent>
-        {session ? (
-          <div className="flex flex-col items-center gap-3 text-center">
-            <Link href={`/profile`} className="hover:underline">
-              <h1 className="text-lg font-semibold">
-                {session.user.first_name} {session.user.last_name}
-              </h1>
-            </Link>
-            <span className="text-muted-foreground text-sm">
-              {data?.data.profile ? (
-                <>
-                  {data.data.profile.role ?? ""} |{" "}
-                  {data.data.profile.university ?? ""}
-                </>
-              ) : (
-                ""
-              )}
-            </span>
-            <Link
-              href={"/followers"}
-              className="hover:text-[#0284C7] hover:underline"
-            >
-              <p className="text-sm text-[#0284C7]">
-                {count?.data.followers_count} Followers
-              </p>
-            </Link>
-          </div>
-        ) : (
+        <CardContent>
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <h1 className="text-lg font-semibold">
@@ -133,7 +79,68 @@ export default function CardProfileFeed() {
               </Button>
             </div>
           </div>
-        )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="w-full overflow-hidden pt-0 shadow-xs">
+      {/* Background */}
+      <div className="relative h-16 w-full md:h-24 2xl:h-32">
+        <Image
+          src="/images/profile/bg.jpg"
+          alt="background"
+          fill
+          className="object-cover"
+        />
+      </div>
+
+      {/* Profile picture */}
+      <div className="relative mx-auto -mt-16 flex h-[72px] w-[72px]">
+        <Image
+          src={
+            data?.data?.profile?.profile_images
+              ? buildFromAppURL(data.data.profile.profile_images)
+              : "/images/profile/profile-2d.png"
+          }
+          alt={data?.data?.first_name ?? "Profile User"}
+          width={72}
+          height={72}
+          className="rounded-full border-4 border-white object-cover shadow-md"
+        />
+      </div>
+
+      <CardContent>
+        <div className="-mt-2 flex flex-col items-center gap-3 text-center">
+          <Link href={`/profile`} className="hover:underline">
+            <h1 className="text-lg font-semibold">
+              {session.user.first_name} {session.user.last_name}
+            </h1>
+          </Link>
+
+          {isPending ? (
+            <Skeleton className="h-4 w-40" />
+          ) : (
+            <span className="text-muted-foreground text-sm">
+              {data?.data?.profile?.role ?? ""}{" "}
+              {data?.data?.profile?.university
+                ? `| ${data.data.profile.university}`
+                : ""}
+            </span>
+          )}
+
+          {/* followers */}
+          {isCountPending ? (
+            <Skeleton className="h-4 w-28" />
+          ) : (
+            <Link href={`/followers`}>
+              <p className="text-sm text-[#0284C7]">
+                {count?.data?.followers_count ?? 0} Followers
+              </p>
+            </Link>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

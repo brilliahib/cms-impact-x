@@ -10,6 +10,12 @@ import { Download, Settings } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const CardProfile = () => {
   const { data: session, status } = useSession();
@@ -31,52 +37,26 @@ const CardProfile = () => {
   if (status === "loading" || isPending) {
     return (
       <Card className="w-full overflow-hidden p-0">
-        {/* Background */}
+        {/* Skeleton untuk loading */}
         <div className="relative h-32 w-full md:h-44">
           <Skeleton className="h-full w-full" />
         </div>
-
-        {/* Profile Picture */}
-        <div className="relative -mt-16 ml-4 flex h-[100px] w-[100px] justify-start rounded-full md:-mt-24 md:h-[150px] md:w-[150px]">
+        <div className="relative -mt-16 ml-4 flex h-[100px] w-[100px] rounded-full">
           <Skeleton className="h-full w-full rounded-full border-4 border-white shadow-md" />
         </div>
-
-        <div className="-mt-0 flex flex-col items-start gap-4 px-6 md:-mt-24 md:flex-row md:items-center md:gap-6">
-          <div className="space-y-2 md:ml-40">
-            <Skeleton className="h-6 w-40" />
-            <div className="flex flex-row gap-4">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-20" />
-            </div>
-          </div>
-
-          <div className="flex w-full flex-col gap-2 md:ml-auto md:w-auto md:flex-row">
-            <Skeleton className="h-10 w-full md:w-44" />
-            <Skeleton className="h-10 w-full md:w-32" />
-          </div>
-        </div>
-
-        <div className="flex flex-col justify-between gap-6 p-6 md:flex-row">
-          <div className="flex-1">
-            <CardTitle className="pb-2 text-base md:pb-4 md:text-lg">
-              <Skeleton className="h-6 w-20" />
-            </CardTitle>
-            <CardDescription className="mb-4 text-justify text-xs tracking-wider md:text-base">
-              <Skeleton className="h-20 w-full" />
-            </CardDescription>
-          </div>
-
-          <div className="flex basis-full flex-row items-center gap-2 md:basis-1/5">
-            <Skeleton className="h-[50px] w-[50px] rounded-md" />
-            <div className="flex flex-col gap-2">
-              <Skeleton className="h-4 w-28" />
-              <Skeleton className="h-3 w-20" />
-            </div>
-          </div>
+        <div className="-mt-0 flex flex-col gap-4 px-6 md:-mt-24">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-4 w-64" />
+          <Skeleton className="h-10 w-32" />
         </div>
       </Card>
     );
   }
+
+  const roleEmpty = !data?.data.role;
+  const skillsEmpty = !data?.data.skills || data.data.skills.length === 0;
+  const universityEmpty = !data?.data.university;
+  const aboutEmpty = !data?.data.about_description;
 
   return (
     <Card className="w-full overflow-hidden p-0">
@@ -91,7 +71,7 @@ const CardProfile = () => {
       </div>
 
       {/* Profile Picture */}
-      <div className="relative -mt-16 ml-4 flex h-[100px] w-[100px] justify-start rounded-full md:-mt-24 md:h-[150px] md:w-[150px]">
+      <div className="relative -mt-16 ml-4 flex h-[100px] w-[100px] rounded-full md:-mt-24 md:h-[150px] md:w-[150px]">
         <Image
           src={
             data?.data.profile_images
@@ -104,22 +84,38 @@ const CardProfile = () => {
         />
       </div>
 
-      <div className="-mt-0 flex flex-col items-start gap-4 px-6 md:-mt-24 md:flex-row md:items-center md:gap-6">
+      {/* Header Info */}
+      <div className="-mt-0 flex flex-col items-start gap-4 px-6 md:-mt-22 md:flex-row md:items-center md:gap-6">
         <div className="space-y-1 md:ml-40">
           <h2 className="text-lg font-bold md:text-xl">
             {session?.user.first_name} {session?.user.last_name}
           </h2>
-          <div className="flex flex-row gap-4 text-sm font-medium text-gray-900/60 md:text-base">
-            <p>{data?.data.role}</p>
-            <span className="opacity-30">|</span>
-            <Link
-              href={`/followers`}
-              className="hover:text-sky-600 hover:underline"
-            >
-              <p className="text-sky-600">
-                {count?.data.followers_count ?? 0} Followers
+
+          <div className="flex flex-row gap-4 text-sm text-gray-900/60 md:text-base">
+            {roleEmpty ? (
+              <p>
+                Isi role kamu{" "}
+                <Link
+                  href="/profile/edit"
+                  className="text-sky-600 hover:underline"
+                >
+                  disini
+                </Link>
               </p>
-            </Link>
+            ) : (
+              <>
+                <p>{data?.data.role}</p>
+                <span className="opacity-30">|</span>
+                <Link
+                  href={`/followers`}
+                  className="hover:text-sky-600 hover:underline"
+                >
+                  <p className="text-sky-600">
+                    {count?.data.followers_count ?? 0} Followers
+                  </p>
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
@@ -137,45 +133,97 @@ const CardProfile = () => {
         </div>
       </div>
 
-      <div className="flex flex-col justify-between gap-6 p-6 md:flex-row">
-        <div className="flex-1">
-          <CardTitle className="pb-2 text-base md:pb-4 md:text-lg">
-            About
-          </CardTitle>
-          <CardDescription className="mb-4 text-justify text-xs tracking-wider md:text-base">
-            {data?.data.about_description ?? "-"}
-          </CardDescription>
-
+      {/* Skills & University */}
+      <div className="flex flex-col items-start justify-between gap-4 p-6 md:-mt-4">
+        <div className="flex w-full items-center justify-between gap-2">
           <div className="space-y-2">
             <h3 className="text-lg font-semibold">Skills</h3>
-            <div className="flex flex-wrap items-center gap-4">
-              {data?.data.skills.map((skill, i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <p className="text-sky-600">{skill}</p>
-                  {i < data.data.skills.length - 1 && (
-                    <span className="opacity-40">|</span>
-                  )}
-                </div>
-              ))}
+
+            {skillsEmpty ? (
+              // 🟢 Ajakan isi skill
+              <p className="text-muted-foreground text-sm">
+                Kamu belum menambahkan{" "}
+                <span className="font-semibold">skill</span>.{" "}
+                <Link
+                  href="/profile/edit"
+                  className="text-sky-600 hover:underline"
+                >
+                  Tambahkan di sini.
+                </Link>
+              </p>
+            ) : (
+              <div className="flex flex-wrap items-center gap-4">
+                {data?.data.skills.map((skill, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <p className="text-sky-600">{skill}</p>
+                    {i < data.data.skills.length - 1 && (
+                      <span className="opacity-40">|</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="mr-8 flex items-center gap-4">
+            <Image
+              src="/images/profile/undip.png"
+              width={50}
+              height={50}
+              alt="university"
+              className="rounded-md"
+            />
+            <div className="flex flex-col gap-1">
+              {universityEmpty ? (
+                <p className="text-muted-foreground text-xs">
+                  <Link
+                    href="/profile/edit"
+                    className="font-semibold text-sky-600 hover:underline"
+                  >
+                    Tambah Universitas
+                  </Link>
+                </p>
+              ) : (
+                <>
+                  <h2 className="text-xs font-semibold md:text-sm">
+                    {data?.data.university}
+                  </h2>
+                  <p className="text-xs">{data?.data.major ?? "-"}</p>
+                </>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="flex basis-full flex-row items-center gap-2 md:basis-1/5">
-          <Image
-            src="/images/profile/undip.png"
-            width={50}
-            height={50}
-            alt="undip"
-            className="rounded-md"
-          />
-          <div className="flex flex-col gap-1">
-            <h2 className="text-xs font-semibold md:text-sm">
-              {data?.data.university ?? "-"}
-            </h2>
-            <p className="text-xs">{data?.data.major ?? "-"}</p>
-          </div>
-        </div>
+        {/* Accordion About */}
+        <Accordion type="single" collapsible className="w-full p-0">
+          <AccordionItem value="about">
+            <AccordionTrigger className="text-muted-foreground justify-center rounded-none border-t pt-4 pb-0 text-sm font-medium hover:underline">
+              See Details
+            </AccordionTrigger>
+            <AccordionContent>
+              <CardTitle className="pb-2 text-base md:pb-4 md:text-lg">
+                About
+              </CardTitle>
+              <CardDescription className="mt-2 text-justify text-xs md:text-sm">
+                {aboutEmpty ? (
+                  <p className="text-muted-foreground">
+                    Kamu belum menambahkan deskripsi{" "}
+                    <span className="font-semibold">About</span>.{" "}
+                    <Link
+                      href="/profile/edit"
+                      className="text-sky-600 hover:underline"
+                    >
+                      Tulis sekarang.
+                    </Link>
+                  </p>
+                ) : (
+                  data?.data.about_description
+                )}
+              </CardDescription>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </Card>
   );

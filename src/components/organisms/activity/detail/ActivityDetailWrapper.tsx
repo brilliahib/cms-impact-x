@@ -24,7 +24,7 @@ export default function ActivityDetailWrapper({
     },
   );
 
-  const isOwner = data?.data?.user_id === session?.user?.id;
+  const isOwner = data?.data?.user.id === session?.user?.id;
 
   return (
     <>

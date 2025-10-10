@@ -13,6 +13,7 @@ import { id } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Activity } from "@/types/activity/activity";
+import Link from "next/link";
 
 interface CardListActivityPeopleProps {
   data?: Activity[];
@@ -106,7 +107,11 @@ export default function CardListActivityPeople({
                 </p>
               </CardContent>
               <CardFooter>
-                <Button variant={"outline"}>See Details</Button>
+                <Button variant={"outline"}>
+                  <Link href={`/activity?activity_id=${activity.id}`}>
+                    See Details
+                  </Link>
+                </Button>
               </CardFooter>
             </Card>
           ))}
