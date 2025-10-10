@@ -51,6 +51,7 @@ import { buildFromAppURL } from "@/utils/misc";
 import { useGetCountUnreadNotification } from "@/http/notification/get-count-unread-notification";
 import { NotificationBar } from "../notif/NotificationBar";
 import { useGetAllNotification } from "@/http/notification/get-all-notification";
+import SearchCommand from "../search/SearchCommand";
 
 function MobileLink({
   href,
@@ -136,6 +137,7 @@ export default function NavButton({ session, isPending }: NavButtonProps) {
           </div>
         ) : session ? (
           <div className="flex items-center gap-8">
+            <SearchCommand />
             <NotificationBar count={count?.data} data={notifications?.data} />
 
             <DropdownMenu>
