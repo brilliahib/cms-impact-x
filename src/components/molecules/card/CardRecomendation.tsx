@@ -1,3 +1,5 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -35,6 +37,8 @@ export default function CardRecomendation({
     },
   );
 
+  const isLoggedIn = !!session?.user;
+
   const dataFiltered = data?.data?.filter(
     (activity: Activity) =>
       activity.activity_type?.toLowerCase() === type.toLowerCase(),
@@ -46,10 +50,14 @@ export default function CardRecomendation({
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
+
       <CardContent className="px-4 2xl:px-6">
         <div className="flex flex-col gap-4">
-          {/* Loading state */}
-          {isPending &&
+          {!isLoggedIn ? (
+            <p className="text-center text-sm text-gray-500">
+              Login to see {type}!
+            </p>
+          ) : isPending ? (
             [1, 2, 3].map((i) => (
               <Card key={i} className="p-2">
                 <CardContent className="space-y-2 p-2">
@@ -65,50 +73,53 @@ export default function CardRecomendation({
                   <Skeleton className="h-3 w-3/4" />
                 </CardContent>
               </Card>
-            ))}
+            ))
+          ) : dataFiltered && dataFiltered.length > 0 ? (
+            dataFiltered.slice(0, 3).map((activity: Activity) => (
+              <Link key={activity.id} href={`/activity?id=${activity.id}`}>
+                <Card className="p-2 shadow-none transition-colors hover:bg-gray-50">
+                  <CardContent className="space-y-2 p-1">
+                    <div className="flex items-center justify-between">
+                      <h1 className="line-clamp-1 text-sm font-medium">
+                        {activity.title}
+                      </h1>
+                      <Badge
+                        variant="default"
+                        className={`rounded-full px-3 font-semibold transition-colors ${
+                          (activity.total_participants ?? 0) >=
+                          (activity.max_participants ?? 0)
+                            ? "bg-gray-200 text-gray-600"
+                            : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {activity.total_participants ?? 0}/
+                        {activity.max_participants}
+                      </Badge>
+                    </div>
 
-          {/* Empty state */}
-          {!isPending && dataFiltered?.length === 0 && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className="capitalize">{type}</Badge>
+                      {activity.activity_category.map(
+                        (cat: string, index: number) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="text-muted-foreground capitalize"
+                          >
+                            {cat}
+                          </Badge>
+                        ),
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))
+          ) : (
             <p className="text-muted-foreground text-center text-sm">
               {emptyMessage}
             </p>
           )}
-
-          {/* Render max 3 */}
-          {dataFiltered?.slice(0, 3).map((activity: Activity) => (
-            <Link key={activity.id} href={`/activity?id=${activity.id}`}>
-              <Card
-                key={activity.id}
-                className="p-2 shadow-none hover:bg-gray-50"
-              >
-                <CardContent className="space-y-2 p-1">
-                  <div className="flex justify-between">
-                    <h1 className="line-clamp-1 text-sm font-medium">
-                      {activity.title}
-                    </h1>
-                    <Badge className="rounded-full bg-green-500/20 text-green-500">
-                      {activity.total_participants}/{activity.max_participants}
-                    </Badge>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge>{type}</Badge>
-                    {activity.activity_category.map(
-                      (cat: string, index: number) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="text-muted-foreground"
-                        >
-                          {cat}
-                        </Badge>
-                      ),
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
         </div>
       </CardContent>
     </Card>

@@ -82,7 +82,7 @@ export default function CardListAuthorActivity({
             <CardHeader className="flex items-start justify-between">
               <div className="space-y-4">
                 <Link
-                  href={`/activity/${activity.id}`}
+                  href={`/activity?id=${activity.id}`}
                   className="mb-4 block hover:underline"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -129,7 +129,7 @@ export default function CardListAuthorActivity({
               </p>
             </CardContent>
             <CardFooter>
-              <Link key={activity.id} href={`/activity'?id=${activity.id}`}>
+              <Link key={activity.id} href={`/activity?id=${activity.id}`}>
                 <Button variant={"outline"} className="cursor-pointer">
                   See Details
                 </Button>

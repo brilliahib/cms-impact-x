@@ -13,16 +13,13 @@ export default function ActivityContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Ambil `type` dari query param
   const typeFromUrl = searchParams.get("type") || "";
   const [activityType, setActivityType] = useState<string>(typeFromUrl);
 
-  // Update state kalau param di URL berubah
   useEffect(() => {
     setActivityType(typeFromUrl);
   }, [typeFromUrl]);
 
-  // Fetch data aktivitas berdasarkan type
   const { data, isPending } = useGetAllActivityByType(
     session?.access_token as string,
     activityType,
@@ -48,7 +45,6 @@ export default function ActivityContent() {
     },
   );
 
-  // Saat user ubah dropdown "Select Activity Type"
   const handleTypeChange = (type: string) => {
     setActivityType(type);
     const query = type ? `?type=${type}` : "";
@@ -64,7 +60,6 @@ export default function ActivityContent() {
         onTypeChange={handleTypeChange}
         selectedType={activityType === "" ? "all" : activityType}
       />
-
       <CardActivityDetail
         session={session!}
         data={detail?.data}
