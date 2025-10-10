@@ -6,6 +6,7 @@ import ActivityDetailLeftContent from "./ActivityDetailLeftContent";
 import { useSession } from "next-auth/react";
 import { useGetDetailActivity } from "@/http/activity/get-detail-activity";
 import CardApplyActivityDetail from "@/components/molecules/card/CardApplyActivityDetail";
+import CardChatRoomActivity from "@/components/molecules/card/CardChatRoomActivity";
 
 interface ActivityDetailWrapperProps {
   id: number;
@@ -37,17 +38,20 @@ export default function ActivityDetailWrapper({
           <ActivityDetailLeftContent data={data?.data} isPending={isPending} />
         </div>
 
-        {isOwner && (
-          <div className="flex flex-col gap-4 md:w-1/3">
-            <CardListDetailActivity id={id} />
-          </div>
-        )}
+        <div className="flex flex-col gap-6 md:w-1/3">
+          <CardChatRoomActivity id={id} />
+          {isOwner && (
+            <>
+              <CardListDetailActivity id={id} />
+            </>
+          )}
 
-        {!isOwner && (
-          <div className="flex flex-col gap-4 md:w-1/3">
-            <CardApplyActivityDetail id={id} />
-          </div>
-        )}
+          {!isOwner && (
+            <>
+              <CardApplyActivityDetail id={id} />
+            </>
+          )}
+        </div>
       </div>
     </>
   );
