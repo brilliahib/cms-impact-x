@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 interface CardPeopleSuggestProps {
   data?: User[];
@@ -18,6 +21,7 @@ export default function CardPeopleSuggest({
   data,
   isPending,
 }: CardPeopleSuggestProps) {
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const followMutation = useFollowUser({
@@ -29,22 +33,21 @@ export default function CardPeopleSuggest({
     },
   });
 
+  const isLoggedIn = !!session?.user;
+
   return (
     <Card className="shadow-xs">
       <CardHeader className="flex items-center justify-between">
         <CardTitle>People You May Know</CardTitle>
         <Button
-          variant={"ghost"}
+          variant="ghost"
           className="p-0 text-[#0284C7] hover:bg-transparent hover:text-[#0284C7] hover:underline 2xl:px-4 2xl:py-2"
-        >
-          <Link href={"/suggest"} className="text-xs">
-            See All
-          </Link>
-        </Button>
+        ></Button>
       </CardHeader>
+
       <CardContent>
         <div className="flex flex-col gap-4">
-          {isPending ? (
+          {isLoggedIn && isPending ? (
             [...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center gap-3">
                 <Skeleton className="h-12 w-12 rounded-full border" />
@@ -79,24 +82,38 @@ export default function CardPeopleSuggest({
                         {user.first_name} {user.last_name}
                       </h1>
                     </Link>
-                    {user.profile && user.profile.university && (
+                    {user.profile?.university && (
                       <span className="text-muted-foreground line-clamp-1 text-sm">
                         {user.profile.university}
                       </span>
                     )}
                   </div>
                 </div>
-                <Button
-                  variant={"outline"}
-                  size={"sm"}
-                  onClick={() => followMutation.mutate(user.username)}
-                  className="text-xs 2xl:text-sm"
-                >
-                  Follow
-                </Button>
+
+                {isLoggedIn ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => followMutation.mutate(user.username)}
+                    className="text-xs 2xl:text-sm"
+                  >
+                    Follow
+                  </Button>
+                ) : (
+                  <Link href="/login">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-muted-foreground text-xs 2xl:text-sm"
+                    >
+                      Login to Follow
+                    </Button>
+                  </Link>
+                )}
               </div>
             ))
           ) : (
+            // Tidak ada data
             <p className="text-muted-foreground text-sm">
               No suggestions available.
             </p>

@@ -16,7 +16,7 @@ import {
 import { Activity } from "@/types/activity/activity";
 import { buildFromAppURL } from "@/utils/misc";
 import { format } from "date-fns";
-import { Clock3, MapPin, Send } from "lucide-react";
+import { ArrowRight, Clock3, MapPin, Send } from "lucide-react";
 import Image from "next/image";
 import { id } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,6 +36,8 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Link from "next/link";
+import { useFollowUser } from "@/http/follow/follow-user";
 
 interface CardActivityDetailProps {
   data?: Activity;
@@ -57,7 +59,6 @@ export default function CardActivityDetail({
   );
 
   const queryClient = useQueryClient();
-
   const [open, setOpen] = useState(false);
 
   const createRegistration = useCreateRegistration({
@@ -72,6 +73,22 @@ export default function CardActivityDetail({
     },
     onError: () => {
       toast.error("Failed to apply this activity!");
+    },
+  });
+
+  const isLoggedIn = !!session?.user;
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+
+  const followMutation = useFollowUser({
+    onSuccess: () => {
+      toast.success("You are now following this user!");
+      queryClient.invalidateQueries({ queryKey: ["suggest-people"] });
+      queryClient.invalidateQueries({
+        queryKey: ["get-user-profile", data?.user?.id],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to follow this user!");
     },
   });
 
@@ -150,7 +167,7 @@ export default function CardActivityDetail({
   }
 
   return (
-    <div className="w-full md:flex-3">
+    <div className="w-full md:max-w-[60%] md:basis-[60%]">
       <Card>
         <CardHeader className="border-b pb-4">
           <div className="flex justify-between">
@@ -177,19 +194,46 @@ export default function CardActivityDetail({
             </div>
             <div className="flex items-center gap-2">
               {session?.user.id === data?.user.id ? (
-                <Badge
-                  variant="default"
-                  className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
-                >
-                  Your Activity
-                </Badge>
+                <div className="flex items-center gap-4">
+                  <Badge
+                    variant="default"
+                    className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
+                  >
+                    Your Activity
+                  </Badge>
+                  <Link href={`/activity/${data?.id}`}>
+                    <Button variant={"outline"} className="cursor-pointer">
+                      See Details
+                      <ArrowRight />
+                    </Button>
+                  </Link>
+                </div>
               ) : (
-                <>
-                  <Button variant={"outline"}>Follow</Button>
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant={isFollowing ? "secondary" : "outline"}
+                    size="sm"
+                    disabled={!isLoggedIn || followMutation.isPending}
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        toast.error("Please log in to follow users.");
+                        return;
+                      }
+                      followMutation.mutate(data?.user.username ?? "");
+                      setIsFollowing(true);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    {followMutation.isPending
+                      ? "Following..."
+                      : isFollowing
+                        ? "Following"
+                        : "Follow"}
+                  </Button>
                   <Button onClick={handleApply} disabled={check?.data.applied}>
                     {check?.data.applied ? "Applied" : "Apply Now"} <Send />
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </div>
@@ -199,45 +243,95 @@ export default function CardActivityDetail({
             <CardHeader className="border-b pb-4">
               <div className="space-y-4">
                 {data?.participants && data.participants.length > 0 ? (
-                  <div className="relative flex items-center justify-center">
-                    <Carousel className="w-full max-w-6xl">
+                  <div className="relative w-full">
+                    <Carousel className="relative mx-auto w-[85%] max-w-6xl 2xl:w-[90%]">
                       <CarouselContent className="-ml-2 flex items-stretch md:-ml-4">
-                        {data.participants.map((participant) => (
-                          <CarouselItem
-                            key={participant.id}
-                            className="basis-full pl-2 md:basis-1/2 md:pl-4 2xl:basis-1/3"
-                          >
-                            <Card className="h-full px-0 py-2 shadow-none">
-                              <CardContent className="flex items-center gap-4">
-                                <Image
-                                  src={
-                                    participant?.profile_images
-                                      ? buildFromAppURL(
-                                          participant?.profile_images,
-                                        )
-                                      : "/images/profile/profile-2d.png"
-                                  }
-                                  alt={participant?.name ?? "Profile User"}
-                                  width={50}
-                                  height={50}
-                                  className="min-h-[50px] min-w-[50px] rounded-full border object-cover"
-                                />
-                                <div className="text-sm">
-                                  <p className="line-clamp-1 font-semibold">
-                                    {participant.name}
-                                  </p>
-                                  <p className="text-muted-foreground line-clamp-1 text-xs">
-                                    {participant.role}
-                                  </p>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
+                        {data?.user ||
+                        (data?.participants && data.participants.length > 0) ? (
+                          <>
+                            {data?.user && (
+                              <CarouselItem
+                                key={`author-${data.user.id}`}
+                                className="basis-full pl-2 md:basis-1/2 md:pl-4 2xl:basis-1/3"
+                              >
+                                <Card className="h-full border-2 border-green-300 px-0 py-1 shadow-none">
+                                  <CardContent className="flex items-center gap-4 p-2">
+                                    <Image
+                                      src={
+                                        data.user.profile_images
+                                          ? buildFromAppURL(
+                                              data.user.profile_images,
+                                            )
+                                          : "/images/profile/profile-2d.png"
+                                      }
+                                      alt={data.user.name ?? "Profile User"}
+                                      width={45}
+                                      height={45}
+                                      className="min-h-[45px] min-w-[45px] rounded-full border object-cover"
+                                    />
+                                    <div className="text-sm">
+                                      <div className="flex gap-2">
+                                        <p className="line-clamp-1 font-semibold">
+                                          {data.user.name}
+                                        </p>
+                                        <Badge
+                                          variant="secondary"
+                                          className="bg-green-100 text-xs text-green-700"
+                                        >
+                                          Author
+                                        </Badge>
+                                      </div>
+                                      <p className="text-muted-foreground line-clamp-1 text-xs">
+                                        {data.user.role}
+                                      </p>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </CarouselItem>
+                            )}
 
-                      <CarouselPrevious className="hover:bg-muted absolute top-1/2 left-2 z-10 -translate-y-1/2 cursor-pointer rounded-full bg-white shadow-md transition-colors" />
-                      <CarouselNext className="hover:bg-muted absolute top-1/2 right-2 z-10 -translate-y-1/2 cursor-pointer rounded-full bg-white shadow-md transition-colors" />
+                            {/* 👥 Participants */}
+                            {data?.participants?.map((participant) => (
+                              <CarouselItem
+                                key={participant.id}
+                                className="basis-full pl-2 md:basis-1/2 md:pl-4 2xl:basis-1/3"
+                              >
+                                <Card className="h-full px-0 py-1 shadow-none">
+                                  <CardContent className="flex items-center gap-4 p-2">
+                                    <Image
+                                      src={
+                                        participant?.profile_images
+                                          ? buildFromAppURL(
+                                              participant?.profile_images,
+                                            )
+                                          : "/images/profile/profile-2d.png"
+                                      }
+                                      alt={participant?.name ?? "Profile User"}
+                                      width={45}
+                                      height={45}
+                                      className="min-h-[45px] min-w-[45px] rounded-full border object-cover"
+                                    />
+                                    <div className="text-sm">
+                                      <p className="line-clamp-1 font-semibold">
+                                        {participant.name}
+                                      </p>
+                                      <p className="text-muted-foreground line-clamp-1 text-xs">
+                                        {participant.role}
+                                      </p>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </CarouselItem>
+                            ))}
+                          </>
+                        ) : (
+                          <p className="text-muted-foreground w-full text-center text-sm">
+                            No participants yet.
+                          </p>
+                        )}
+                      </CarouselContent>
+                      <CarouselPrevious className="hover:bg-muted absolute top-1/2 -left-12 z-20 -translate-y-1/2 cursor-pointer rounded-full bg-white shadow-md transition-colors" />
+                      <CarouselNext className="hover:bg-muted absolute top-1/2 -right-12 z-20 -translate-y-1/2 cursor-pointer rounded-full bg-white shadow-md transition-colors" />
                     </Carousel>
                   </div>
                 ) : (
@@ -265,24 +359,72 @@ export default function CardActivityDetail({
                   </div>
 
                   <div className="flex w-3/4 flex-wrap gap-2">
-                    <Badge>{data?.activity_type}</Badge>
-                    <div>
-                      {data?.activity_category.map((category, index) => (
-                        <Badge key={index} variant={"secondary"}>
+                    {data?.activity_type && (
+                      <Link
+                        href={`/activity?type=${encodeURIComponent(
+                          data.activity_type.toLowerCase(),
+                        )}`}
+                        passHref
+                      >
+                        <Badge className="cursor-pointer capitalize transition">
+                          {data.activity_type}
+                        </Badge>
+                      </Link>
+                    )}
+
+                    {(Array.isArray(data?.activity_category)
+                      ? data.activity_category
+                      : (() => {
+                          try {
+                            return JSON.parse(data?.activity_category || "[]");
+                          } catch {
+                            return [];
+                          }
+                        })()
+                    ).map((category: string, index: number) => (
+                      <Link
+                        key={index}
+                        href={`/activity?category=${encodeURIComponent(
+                          category.toLowerCase(),
+                        )}`}
+                        passHref
+                      >
+                        <Badge
+                          variant="secondary"
+                          className="cursor-pointer capitalize"
+                        >
                           {category}
                         </Badge>
-                      ))}
-                    </div>
+                      </Link>
+                    ))}
                   </div>
 
                   <Card className="mt-6 flex flex-row items-center justify-between p-4 shadow-none">
                     <h1 className="font-medium">Total Participants</h1>
-                    <Badge
-                      variant={"default"}
-                      className="rounded-full bg-green-100 px-4 text-base text-green-700"
-                    >
-                      {data?.total_participants}/{data?.max_participants}
-                    </Badge>
+
+                    {data ? (
+                      <Badge
+                        variant="default"
+                        className={`rounded-full px-4 text-base transition-colors ${
+                          (data.total_participants ?? 0) >=
+                          (data.max_participants ?? 0)
+                            ? "bg-gray-200 text-gray-600"
+                            : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {(data.total_participants ?? 0) >=
+                        (data.max_participants ?? 0)
+                          ? "Full"
+                          : `${data.total_participants ?? 0}/${data.max_participants ?? 0}`}
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="secondary"
+                        className="rounded-full bg-gray-100 px-4 text-base text-gray-500"
+                      >
+                        Loading...
+                      </Badge>
+                    )}
                   </Card>
                 </div>
                 <Dialog>
@@ -352,7 +494,7 @@ export default function CardActivityDetail({
                     {data?.description ?? "No description available."}
                   </p>
                 </div>
-                <div className="flex flex-row">
+                <div className="flex flex-row gap-8">
                   <div className="flex flex-1 flex-col gap-2">
                     <h1 className="font-bold">Requirements</h1>
                     <p className="text-muted-foreground">
