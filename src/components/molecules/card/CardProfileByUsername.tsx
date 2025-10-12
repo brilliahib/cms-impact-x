@@ -187,7 +187,12 @@ const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
         <div className="flex w-full flex-col gap-2 md:ml-auto md:w-auto md:flex-row">
           {session?.user.id === data?.data?.user_id ? (
             <>
-              <Button variant={"outline"}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  window.open("/api/cv", "_blank");
+                }}
+              >
                 <Download />
                 Download Portofolio
               </Button>
@@ -223,7 +228,12 @@ const CardProfileByUsername = ({ username }: CardProfileByUsernameProps) => {
                   Unfollow
                 </Button>
               )}
-              <Button variant={"outline"}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  window.open("/api/cv", "_blank");
+                }}
+              >
                 <Download />
                 Download Portofolio
               </Button>

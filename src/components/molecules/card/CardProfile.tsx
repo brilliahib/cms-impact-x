@@ -120,7 +120,12 @@ const CardProfile = () => {
         </div>
 
         <div className="flex w-full flex-col gap-2 md:ml-auto md:w-auto md:flex-row">
-          <Button variant={"outline"}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              window.open("/api/cv", "_blank");
+            }}
+          >
             <Download />
             Download Portofolio
           </Button>
