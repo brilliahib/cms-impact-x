@@ -10,8 +10,10 @@ import {
   Ellipsis,
   Loader2,
   MessageCircleMore,
+  Pencil,
   SendHorizontal,
   ThumbsUp,
+  Trash2,
 } from "lucide-react";
 import Image from "next/image";
 import { format, formatDistanceToNow } from "date-fns";
@@ -28,6 +30,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useCreateLikeFeed } from "@/http/feeds/like/create-like-feed";
+import { useSession } from "next-auth/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import DialogEditFeed from "../dialog/feeds/DialogEditFeed";
+import { useDeleteFeed } from "@/http/feeds/delete-feed";
+import AlertDialogDeleteFeed from "@/components/atoms/alert-dialog/feed/AlertDialogDeleteFeed";
 
 interface CardListFeedProps {
   data?: Feed[];
@@ -68,7 +80,15 @@ function FeedSkeleton() {
 
 export default function CardListFeed({ data, isPending }: CardListFeedProps) {
   const [activeFeedId, setActiveFeedId] = useState<number | null>(null);
+  const [selectedFeedId, setSelectedFeedId] = useState<number | null>(null);
+  const [selectedFeedIdDelete, setSelectedFeedIdDelete] = useState<
+    number | null
+  >(null);
   const [commentInput, setCommentInput] = useState("");
+  const [isDialogEditFeedOpen, setIsDialogEditFeedOpen] = useState(false);
+  const [isAlertDeleteFeedOpen, setIsAlertDeleteFeedOpen] = useState(false);
+
+  const { data: session } = useSession();
 
   const { data: comments, isPending: isCommentPending } = useGetAllFeedComment(
     activeFeedId!,
@@ -107,251 +127,333 @@ export default function CardListFeed({ data, isPending }: CardListFeedProps) {
     },
   });
 
+  const { mutate: deleteFeed, isPending: isDeletePending } = useDeleteFeed({
+    onSuccess: () => {
+      setSelectedFeedIdDelete(null);
+      toast.success("Successfully deleted this feed!");
+      queryClient.invalidateQueries({
+        queryKey: ["get-all-feed"],
+      });
+    },
+    onError: (err) => {
+      toast.error("Failed to delete this feed: " + err.message);
+    },
+  });
+
+  const handleDeleteFeed = (feedId: number) => {
+    setSelectedFeedIdDelete(feedId);
+    setIsAlertDeleteFeedOpen(true);
+  };
+
   const isEmpty = !isPending && (!data || data.length === 0);
 
+  const handleDialogEditFeedOpen = (feedId: number) => {
+    setSelectedFeedId(feedId);
+    setIsDialogEditFeedOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (selectedFeedIdDelete) {
+      deleteFeed({
+        id: selectedFeedIdDelete,
+        token: session?.access_token ?? "",
+      });
+    }
+  };
+
   return (
-    <div className="w-full space-y-6">
-      {isPending ? (
-        Array.from({ length: 3 }).map((_, i) => <FeedSkeleton key={i} />)
-      ) : isEmpty ? (
-        <div className="text-muted-foreground flex flex-col items-center justify-center py-10 text-center">
-          <p className="text-sm">Your feed is empty. Create your first post!</p>
-        </div>
-      ) : (
-        data?.map((feed) => (
-          <Card key={feed.id} className="w-full">
-            <CardHeader>
-              <div className="flex justify-between">
-                <div className="flex items-center gap-3">
-                  <Image
-                    src={
-                      feed?.user.profile_images
-                        ? buildFromAppURL(feed.user.profile_images)
-                        : "/images/profile/profile-2d.png"
-                    }
-                    alt={feed?.user.name ?? "Profile User"}
-                    width={50}
-                    height={50}
-                    className="min-h-[50px] min-w-[50px] rounded-full border object-cover"
-                  />
-                  <div className="flex flex-col gap-1">
-                    <Link
-                      href={`/profile/${feed.user.username}`}
-                      className="hover:underline"
-                    >
-                      <h1 className="font-medium">{feed.user.name}</h1>
-                    </Link>
-                    <span className="text-muted-foreground text-sm">
-                      {feed?.user &&
-                      (feed.user.role || feed.user.university) ? (
-                        <>
-                          {feed.user.role ?? ""}
-                          {feed.user.role && feed.user.university ? " | " : ""}
-                          {feed.user.university ?? ""}
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </span>
-                    <p className="text-muted-foreground text-xs">
-                      {format(new Date(feed.created_at), "d MMMM yyyy", {
-                        locale: id,
-                      })}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <Ellipsis />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="border-b pb-4">
-                <h1 className="text-sm leading-6">{feed.content}</h1>
-              </div>
-              {feed.activity && (
-                <Link href={`/activity?id=${feed.activity.id}`}>
-                  <Card className="mt-4 pt-0 shadow-none">
-                    <CardHeader className="p-0">
-                      <Image
-                        src={buildFromAppURL(feed.activity.images)}
-                        width={100}
-                        height={100}
-                        alt={feed.activity.title}
-                        className="max-h-60 w-full rounded-t-xl object-cover"
-                        unoptimized
-                      />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between">
-                          <h1 className="font-semibold">
-                            {feed.activity.title}
-                          </h1>
-                          <Badge className="rounded-full bg-green-100 px-2 text-green-700">
-                            {feed.activity.total_participants} /{" "}
-                            {feed.activity.max_participants}
-                          </Badge>
-                        </div>
-                        <p className="text-muted-foreground line-clamp-1">
-                          {feed.activity.description}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {feed.activity.activity_category.map(
-                            (category, index) => (
-                              <Badge
-                                variant={"secondary"}
-                                className="capitalize"
-                                key={index}
-                              >
-                                {category}
-                              </Badge>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              )}
-            </CardContent>
-            <CardFooter>
-              <div className="w-full">
-                <div className="flex items-center gap-4">
-                  <div
-                    className="flex cursor-pointer items-center gap-2 text-sm"
-                    onClick={() => {
-                      if (isLikePending) return;
-                      likeFeed(feed.id);
-                    }}
-                  >
-                    <ThumbsUp
-                      size={18}
-                      color={feed.is_liked ? "red" : "currentColor"}
-                    />
-                    <p
-                      className={
-                        feed.is_liked ? "font-medium text-red-500" : ""
+    <>
+      <div className="w-full space-y-6">
+        {isPending ? (
+          Array.from({ length: 3 }).map((_, i) => <FeedSkeleton key={i} />)
+        ) : isEmpty ? (
+          <div className="text-muted-foreground flex flex-col items-center justify-center py-10 text-center">
+            <p className="text-sm">
+              Your feed is empty. Create your first post!
+            </p>
+          </div>
+        ) : (
+          data?.map((feed) => (
+            <Card key={feed.id} className="w-full">
+              <CardHeader>
+                <div className="flex justify-between">
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={
+                        feed?.user.profile_images
+                          ? buildFromAppURL(feed.user.profile_images)
+                          : "/images/profile/profile-2d.png"
                       }
-                    >
-                      {feed.total_likes}
-                    </p>
-                  </div>
-
-                  <div
-                    className="flex cursor-pointer items-center gap-2 text-sm"
-                    onClick={() =>
-                      setActiveFeedId(activeFeedId === feed.id ? null : feed.id)
-                    }
-                  >
-                    <MessageCircleMore size={18} />
-                    <p>{feed.total_comments}</p>
-                  </div>
-                </div>
-                <div className="w-full">
-                  {activeFeedId === feed.id && (
-                    <div className="mt-4 w-full">
-                      <ScrollArea className="h-50 w-full pb-4">
-                        {isCommentPending ? (
-                          <div className="space-y-4">
-                            {Array.from({ length: 3 }).map((_, i) => (
-                              <div key={i} className="flex items-start gap-3">
-                                <Skeleton className="h-10 w-10 rounded-full" />
-                                <div className="w-full space-y-2">
-                                  <Skeleton className="h-4 w-32" />
-                                  <Skeleton className="h-3 w-5/6" />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : comments && comments.data.length > 0 ? (
-                          <div className="space-y-4">
-                            {comments.data.map((comment) => (
-                              <div
-                                key={comment.id}
-                                className="flex items-start gap-3"
-                              >
-                                <Image
-                                  src={
-                                    comment.user.profile_images
-                                      ? buildFromAppURL(
-                                          comment.user.profile_images,
-                                        )
-                                      : "/images/profile/profile-2d.png"
-                                  }
-                                  alt={
-                                    comment.user.first_name ?? "Profile User"
-                                  }
-                                  width={40}
-                                  height={40}
-                                  className="rounded-full border"
-                                />
-                                <div className="bg-muted w-full space-y-1 rounded-lg p-3 text-sm">
-                                  <div className="flex items-center gap-2">
-                                    <Link
-                                      href={`/profile/${comment.user.username}`}
-                                      className="hover:underline"
-                                    >
-                                      <h3 className="font-medium">
-                                        {comment.user.first_name}{" "}
-                                        {comment.user.last_name}
-                                      </h3>
-                                    </Link>
-                                    <p className="text-muted-foreground text-xs">
-                                      {formatDistanceToNow(
-                                        new Date(comment.created_at),
-                                        {
-                                          addSuffix: true,
-                                          includeSeconds: true,
-                                          locale: enUS,
-                                        },
-                                      )}
-                                    </p>
-                                  </div>
-                                  <p>{comment.content}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                      alt={feed?.user.name ?? "Profile User"}
+                      width={50}
+                      height={50}
+                      className="min-h-[50px] min-w-[50px] rounded-full border object-cover"
+                    />
+                    <div className="flex flex-col gap-1">
+                      <Link
+                        href={`/profile/${feed.user.username}`}
+                        className="hover:underline"
+                      >
+                        <h1 className="font-medium">{feed.user.name}</h1>
+                      </Link>
+                      <span className="text-muted-foreground text-sm">
+                        {feed?.user &&
+                        (feed.user.role || feed.user.university) ? (
+                          <>
+                            {feed.user.role ?? ""}
+                            {feed.user.role && feed.user.university
+                              ? " | "
+                              : ""}
+                            {feed.user.university ?? ""}
+                          </>
                         ) : (
-                          <p className="text-muted-foreground text-sm">
-                            No comments yet.
-                          </p>
+                          ""
                         )}
-                      </ScrollArea>
-
-                      <div className="mt-2 flex items-center gap-2">
-                        <Input
-                          placeholder="Write a comment..."
-                          value={commentInput}
-                          onChange={(e) => setCommentInput(e.target.value)}
-                        />
-                        <Button
-                          size="icon"
-                          className="rounded-full"
-                          disabled={!commentInput || isCreating}
-                          onClick={() =>
-                            createComment({
-                              content: commentInput,
-                              mentions: [],
-                            })
-                          }
-                        >
-                          {isCreating ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : (
-                            <SendHorizontal size={16} />
-                          )}
-                        </Button>
-                      </div>
+                      </span>
+                      <p className="text-muted-foreground text-xs">
+                        {format(new Date(feed.created_at), "d MMMM yyyy", {
+                          locale: id,
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  {feed.user.id === session?.user.id && (
+                    <div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Ellipsis />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <div
+                              className="flex w-full flex-row items-center gap-2 text-sm"
+                              onClick={() => handleDialogEditFeedOpen(feed.id)}
+                            >
+                              <Pencil />
+                              <span>Edit</span>
+                            </div>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <div
+                              className="flex w-full flex-row items-center gap-2 text-sm text-red-600"
+                              onClick={() => handleDeleteFeed(feed.id)}
+                            >
+                              <Trash2 className="text-red-500" />
+                              <span>Delete</span>
+                            </div>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   )}
                 </div>
-              </div>
-            </CardFooter>
-          </Card>
-        ))
+              </CardHeader>
+              <CardContent>
+                <div className="border-b pb-4">
+                  <h1 className="text-sm leading-6">{feed.content}</h1>
+                </div>
+                {feed.activity && (
+                  <Link href={`/activity?id=${feed.activity.id}`}>
+                    <Card className="mt-4 pt-0 shadow-none">
+                      <CardHeader className="p-0">
+                        <Image
+                          src={buildFromAppURL(feed.activity.images)}
+                          width={100}
+                          height={100}
+                          alt={feed.activity.title}
+                          className="max-h-60 w-full rounded-t-xl object-cover"
+                          unoptimized
+                        />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between">
+                            <h1 className="font-semibold">
+                              {feed.activity.title}
+                            </h1>
+                            <Badge className="rounded-full bg-green-100 px-2 text-green-700">
+                              {feed.activity.total_participants} /{" "}
+                              {feed.activity.max_participants}
+                            </Badge>
+                          </div>
+                          <p className="text-muted-foreground line-clamp-1">
+                            {feed.activity.description}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {feed.activity.activity_category.map(
+                              (category, index) => (
+                                <Badge
+                                  variant={"secondary"}
+                                  className="capitalize"
+                                  key={index}
+                                >
+                                  {category}
+                                </Badge>
+                              ),
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                )}
+              </CardContent>
+              <CardFooter>
+                <div className="w-full">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className="flex cursor-pointer items-center gap-2 text-sm"
+                      onClick={() => {
+                        if (isLikePending) return;
+                        likeFeed(feed.id);
+                      }}
+                    >
+                      <ThumbsUp
+                        size={18}
+                        color={feed.is_liked ? "red" : "currentColor"}
+                      />
+                      <p
+                        className={
+                          feed.is_liked ? "font-medium text-red-500" : ""
+                        }
+                      >
+                        {feed.total_likes}
+                      </p>
+                    </div>
+
+                    <div
+                      className="flex cursor-pointer items-center gap-2 text-sm"
+                      onClick={() =>
+                        setActiveFeedId(
+                          activeFeedId === feed.id ? null : feed.id,
+                        )
+                      }
+                    >
+                      <MessageCircleMore size={18} />
+                      <p>{feed.total_comments}</p>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    {activeFeedId === feed.id && (
+                      <div className="mt-4 w-full">
+                        <ScrollArea className="h-50 w-full pb-4">
+                          {isCommentPending ? (
+                            <div className="space-y-4">
+                              {Array.from({ length: 3 }).map((_, i) => (
+                                <div key={i} className="flex items-start gap-3">
+                                  <Skeleton className="h-10 w-10 rounded-full" />
+                                  <div className="w-full space-y-2">
+                                    <Skeleton className="h-4 w-32" />
+                                    <Skeleton className="h-3 w-5/6" />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : comments && comments.data.length > 0 ? (
+                            <div className="space-y-4">
+                              {comments.data.map((comment) => (
+                                <div
+                                  key={comment.id}
+                                  className="flex items-start gap-3"
+                                >
+                                  <Image
+                                    src={
+                                      comment.user.profile_images
+                                        ? buildFromAppURL(
+                                            comment.user.profile_images,
+                                          )
+                                        : "/images/profile/profile-2d.png"
+                                    }
+                                    alt={
+                                      comment.user.first_name ?? "Profile User"
+                                    }
+                                    width={40}
+                                    height={40}
+                                    className="rounded-full border"
+                                  />
+                                  <div className="bg-muted w-full space-y-1 rounded-lg p-3 text-sm">
+                                    <div className="flex items-center gap-2">
+                                      <Link
+                                        href={`/profile/${comment.user.username}`}
+                                        className="hover:underline"
+                                      >
+                                        <h3 className="font-medium">
+                                          {comment.user.first_name}{" "}
+                                          {comment.user.last_name}
+                                        </h3>
+                                      </Link>
+                                      <p className="text-muted-foreground text-xs">
+                                        {formatDistanceToNow(
+                                          new Date(comment.created_at),
+                                          {
+                                            addSuffix: true,
+                                            includeSeconds: true,
+                                            locale: enUS,
+                                          },
+                                        )}
+                                      </p>
+                                    </div>
+                                    <p>{comment.content}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-muted-foreground text-sm">
+                              No comments yet.
+                            </p>
+                          )}
+                        </ScrollArea>
+
+                        <div className="mt-2 flex items-center gap-2">
+                          <Input
+                            placeholder="Write a comment..."
+                            value={commentInput}
+                            onChange={(e) => setCommentInput(e.target.value)}
+                          />
+                          <Button
+                            size="icon"
+                            className="rounded-full"
+                            disabled={!commentInput || isCreating}
+                            onClick={() =>
+                              createComment({
+                                content: commentInput,
+                                mentions: [],
+                              })
+                            }
+                          >
+                            {isCreating ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <SendHorizontal size={16} />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardFooter>
+            </Card>
+          ))
+        )}
+      </div>
+
+      {selectedFeedId && (
+        <DialogEditFeed
+          open={isDialogEditFeedOpen}
+          setOpen={setIsDialogEditFeedOpen}
+          id={selectedFeedId}
+        />
       )}
-    </div>
+
+      {selectedFeedIdDelete && (
+        <AlertDialogDeleteFeed
+          open={isAlertDeleteFeedOpen}
+          setOpen={setIsAlertDeleteFeedOpen}
+          confirmDelete={confirmDelete}
+        />
+      )}
+    </>
   );
 }
