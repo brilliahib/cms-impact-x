@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useSession } from "next-auth/react";
 import { useGetUsers } from "@/http/user/get-users";
 import {
@@ -15,8 +14,9 @@ import SearchInput from "@/components/atoms/search/SearchInput";
 import Image from "next/image";
 import Link from "next/link";
 import { buildFromAppURL } from "@/utils/misc";
-import { Button } from "@/components/ui/button";
 import { User } from "@/types/user/user";
+import { useEffect, useMemo, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SearchCommand() {
   const { data: session } = useSession();
@@ -25,18 +25,16 @@ export default function SearchCommand() {
   const { data, isPending, isError } = useGetUsers(token ?? "");
   const users: User[] = data?.data ?? [];
 
-  const [query, setQuery] = React.useState("");
-  const [open, setOpen] = React.useState(false);
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
 
-  // buka dialog saat pertama kali user mulai mengetik
-  React.useEffect(() => {
+  useEffect(() => {
     if (query.trim() !== "" && !open) {
       setOpen(true);
     }
   }, [query, open]);
 
-  // filter hasil user sesuai input
-  const filteredUsers = React.useMemo(() => {
+  const filteredUsers = useMemo(() => {
     const term = query.toLowerCase();
     if (!Array.isArray(users)) return [];
     return users.filter(
@@ -47,12 +45,10 @@ export default function SearchCommand() {
     );
   }, [query, users]);
 
-  if (isPending) return <p>Loading users...</p>;
   if (isError) return <p>Failed to load users.</p>;
 
   return (
     <div className="relative w-full">
-      {/* Input utama */}
       <SearchInput
         placeholder="Search friends..."
         value={query}
@@ -69,51 +65,65 @@ export default function SearchCommand() {
           onValueChange={setQuery}
           placeholder="Type a username to search..."
         />
-        <CommandList>
-          <CommandEmpty>
-            {query ? "No users found." : "Start typing to search."}
-          </CommandEmpty>
 
-          <CommandGroup heading="Users">
-            {filteredUsers.map((user) => (
-              <CommandItem
-                key={user.id}
-                className="flex items-center justify-between gap-3"
-              >
-                <div className="flex items-center gap-3">
-                  <Image
-                    src={
-                      user?.profile?.profile_images
-                        ? buildFromAppURL(user.profile.profile_images)
-                        : "/images/profile/profile-2d.png"
-                    }
-                    alt={`${user.first_name} ${user.last_name}`}
-                    width={40}
-                    height={40}
-                    className="min-h-[40px] min-w-[40px] rounded-full border object-cover"
-                  />
-                  <div>
-                    <Link
-                      href={`/profile/${user.username}`}
-                      className="hover:underline"
-                    >
-                      <p className="text-sm font-medium">
-                        {user.first_name} {user.last_name}
-                      </p>
-                    </Link>
-                    {user.profile?.university && (
-                      <span className="text-muted-foreground text-xs">
-                        {user.profile.university}
-                      </span>
-                    )}
+        <CommandList>
+          {isPending ? (
+            <div className="space-y-3 p-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="h-3 w-32" />
+                    <Skeleton className="h-2 w-24" />
                   </div>
                 </div>
-                {/* <Button variant="outline" size="sm">
-                  Follow
-                </Button> */}
-              </CommandItem>
-            ))}
-          </CommandGroup>
+              ))}
+            </div>
+          ) : (
+            <>
+              <CommandEmpty>
+                {query ? "No users found." : "Start typing to search."}
+              </CommandEmpty>
+
+              <CommandGroup heading="Users">
+                {filteredUsers.map((user) => (
+                  <CommandItem
+                    key={user.id}
+                    className="flex items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={
+                          user?.profile?.profile_images
+                            ? buildFromAppURL(user.profile.profile_images)
+                            : "/images/profile/profile-2d.png"
+                        }
+                        alt={`${user.first_name} ${user.last_name}`}
+                        width={40}
+                        height={40}
+                        className="min-h-[40px] min-w-[40px] rounded-full border object-cover"
+                      />
+                      <div>
+                        <Link
+                          href={`/profile/${user.username}`}
+                          className="hover:underline"
+                        >
+                          <p className="text-sm font-medium">
+                            {user.first_name} {user.last_name}
+                          </p>
+                        </Link>
+                        {user.profile?.university && (
+                          <span className="text-muted-foreground text-xs">
+                            {user.profile.university}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </>
+          )}
         </CommandList>
       </CommandDialog>
     </div>

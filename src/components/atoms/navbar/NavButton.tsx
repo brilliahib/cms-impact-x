@@ -22,15 +22,7 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { components } from "@/data/nav-items";
-import {
-  Bell,
-  Ellipsis,
-  icons,
-  LogOut,
-  Settings,
-  Settings2,
-  User,
-} from "lucide-react";
+import { Ellipsis, LogOut, Settings, Settings2, User } from "lucide-react";
 import { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { generateFallbackFromName } from "@/utils/generate-name";
@@ -41,7 +33,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
@@ -109,22 +100,23 @@ export default function NavButton({ session, isPending }: NavButtonProps) {
     [pathname],
   );
 
-  const { data, isPending: isProfilePending } = useGetProfileSummary(
+  const { data } = useGetProfileSummary(session?.access_token as string, {
+    enabled: !!session,
+  });
+
+  const { data: count } = useGetCountUnreadNotification(
     session?.access_token as string,
     {
       enabled: !!session,
     },
   );
 
-  const { data: count, isPending: isCountPending } =
-    useGetCountUnreadNotification(session?.access_token as string, {
+  const { data: notifications } = useGetAllNotification(
+    session?.access_token as string,
+    {
       enabled: !!session,
-    });
-
-  const { data: notifications, isPending: isNotificationsPending } =
-    useGetAllNotification(session?.access_token as string, {
-      enabled: !!session,
-    });
+    },
+  );
 
   return (
     <>
